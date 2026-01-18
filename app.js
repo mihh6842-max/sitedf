@@ -1,3 +1,5 @@
+console.log('App.js loaded - v2');
+
 // ========== CONFIGURATION ==========
 const CONFIG = {
     APP_NAME: 'P2P Exchange',
@@ -569,6 +571,7 @@ function respondToOffer(offerId) {
         'Откликнуться на заявку?',
         `Вы начнете сделку с ${offer.user_name}. Деньги переводятся напрямую вне сервиса.`,
         () => {
+            console.log('Confirm callback executed');
             const deal = {
                 id: 'deal_' + Date.now() + '_' + state.user.id,
                 offer_id: offer.id,
@@ -576,6 +579,7 @@ function respondToOffer(offerId) {
                 offer_user_name: offer.user_name,
                 offer_username: offer.username,
                 responder_user_id: state.user.id,
+                responder_user_name: state.user.name,
                 from_currency: offer.from_currency,
                 to_currency: offer.to_currency,
                 amount: offer.amount,
@@ -585,17 +589,24 @@ function respondToOffer(offerId) {
                 status: 'pending',
                 created_at: Math.floor(Date.now() / 1000)
             };
+            console.log('Deal created:', deal);
 
             if (db) {
+                console.log('Saving to Firebase...');
                 db.ref('deals/' + deal.id).set(deal).then(() => {
+                    console.log('Deal saved, updating offer status...');
                     return db.ref('offers/' + offer.id + '/status').set('in_deal');
                 }).then(() => {
+                    console.log('All saved, opening deal');
+                    state.myDeals.push(deal);
                     showToast('Вы откликнулись на заявку', 'success');
                     openDeal(deal.id);
                 }).catch(err => {
+                    console.error('Firebase error:', err);
                     showToast('Ошибка: ' + err.message, 'error');
                 });
             } else {
+                console.log('No Firebase, saving locally');
                 state.myDeals.push(deal);
                 offer.status = 'in_deal';
                 showToast('Вы откликнулись на заявку', 'success');
