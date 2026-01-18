@@ -1143,14 +1143,10 @@ function showConfirm(title, text, callback) {
     confirmCallback = callback;
 
     const btn = document.getElementById('confirmBtn');
-    console.log('confirmBtn element:', btn);
     btn.onclick = () => {
-        console.log('confirmBtn clicked!');
+        const cb = confirmCallback;
         closeConfirm();
-        if (confirmCallback) {
-            console.log('Calling callback...');
-            confirmCallback();
-        }
+        if (cb) cb();
     };
 }
 
