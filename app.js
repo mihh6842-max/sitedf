@@ -549,9 +549,21 @@ function viewOffer(offerId) {
     document.getElementById('viewOfferTime').textContent = formatDate(offer.created_at * 1000);
 }
 
+function respondToCurrentOffer() {
+    if (!state.currentOffer) {
+        alert('Заявка не выбрана');
+        return;
+    }
+    respondToOffer(state.currentOffer.id);
+}
+
 function respondToOffer(offerId) {
+    console.log('respondToOffer called, offerId:', offerId);
     const offer = state.allOffers.find(o => o.id === offerId);
-    if (!offer) return;
+    if (!offer) {
+        alert('Заявка не найдена');
+        return;
+    }
 
     showConfirm(
         'Откликнуться на заявку?',
@@ -1112,9 +1124,11 @@ function showToast(message, type = '') {
 let confirmCallback = null;
 
 function showConfirm(title, text, callback) {
+    console.log('showConfirm called:', title);
     document.getElementById('confirmTitle').textContent = title;
     document.getElementById('confirmText').textContent = text;
     document.getElementById('confirmDialog').classList.add('active');
+    console.log('confirmDialog active');
     confirmCallback = callback;
 
     document.getElementById('confirmBtn').onclick = () => {
