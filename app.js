@@ -1,4 +1,4 @@
-console.log('App.js loaded - v3');
+console.log('App.js loaded - v4');
 
 // ========== CONFIGURATION ==========
 const CONFIG = {
@@ -630,29 +630,44 @@ function openDeal(dealId) {
     document.querySelectorAll('#mainApp > .view').forEach(v => v.classList.remove('active'));
     document.getElementById('dealView').classList.add('active');
 
-    document.getElementById('dealUserName').textContent = deal.offer_user_name;
-    document.getElementById('dealUsername').textContent = '@' + deal.offer_username;
-    document.getElementById('dealPair').textContent = `${deal.from_currency} → ${deal.to_currency}`;
-    document.getElementById('dealAmount').textContent = `${deal.amount} ${deal.from_currency}`;
-    document.getElementById('dealRate').textContent = deal.rate;
-    document.getElementById('dealCity').textContent = deal.city;
-    document.getElementById('dealMethod').textContent = deal.payment_method;
-
+    // Header
+    document.getElementById('dealHeaderName').textContent = deal.offer_user_name;
     updateDealStatus();
     loadChat();
 }
 
 function updateDealStatus() {
-    const statusEl = document.getElementById('dealStatus');
-    const completeBtn = document.getElementById('completeDealBtn');
+    const statusText = state.currentDeal.status === 'completed' ? 'Завершена' : 'Ожидает подтверждения';
+    document.getElementById('dealHeaderStatus').textContent = statusText;
+}
 
-    if (state.currentDeal.status === 'pending') {
-        statusEl.innerHTML = '<div class="alert alert-warning">Ожидает подтверждения</div>';
-        completeBtn.style.display = 'block';
-    } else if (state.currentDeal.status === 'completed') {
-        statusEl.innerHTML = '<div class="alert alert-success">Сделка завершена</div>';
-        completeBtn.style.display = 'none';
+function showDealInfo() {
+    const deal = state.currentDeal;
+    if (!deal) return;
+
+    document.getElementById('dealInfoAvatar').textContent = deal.offer_user_name[0].toUpperCase();
+    document.getElementById('dealInfoName').textContent = deal.offer_user_name;
+    document.getElementById('dealInfoUsername').textContent = '@' + deal.offer_username;
+    document.getElementById('dealInfoPair').textContent = `${deal.from_currency} → ${deal.to_currency}`;
+    document.getElementById('dealInfoAmount').textContent = `${deal.amount} ${deal.from_currency}`;
+    document.getElementById('dealInfoRate').textContent = deal.rate;
+    document.getElementById('dealInfoCity').textContent = deal.city;
+    document.getElementById('dealInfoMethod').textContent = deal.payment_method;
+
+    const statusEl = document.getElementById('dealInfoStatus');
+    if (deal.status === 'completed') {
+        statusEl.textContent = 'Завершена';
+        statusEl.classList.add('completed');
+    } else {
+        statusEl.textContent = 'Ожидает';
+        statusEl.classList.remove('completed');
     }
+
+    document.getElementById('dealInfoSheet').classList.add('active');
+}
+
+function closeDealInfo() {
+    document.getElementById('dealInfoSheet').classList.remove('active');
 }
 
 function openTelegramChat() {
@@ -665,6 +680,7 @@ function openTelegramChat() {
 }
 
 function completeDeal() {
+    closeDealInfo();
     showConfirm(
         'Завершить сделку?',
         'Подтвердите, что обмен прошел успешно',
@@ -688,11 +704,12 @@ function completeDeal() {
 }
 
 function reportDeal() {
+    closeDealInfo();
     showConfirm(
         'Пожаловаться на пользователя?',
         'Администратор рассмотрит вашу жалобу',
         () => {
-            showToast('Жалоба отправлена. Мы свяжемся с вами.');
+            showToast('Жалоба отправлена');
         }
     );
 }

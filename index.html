@@ -234,44 +234,15 @@
         <div id="dealView" class="view">
             <div class="deal-view-header">
                 <button class="back-btn" onclick="backFromDeal()">‹</button>
-                <h2>Сделка</h2>
+                <div class="deal-header-info" onclick="showDealInfo()">
+                    <span class="deal-header-name" id="dealHeaderName">Пользователь</span>
+                    <span class="deal-header-status" id="dealHeaderStatus">Ожидает подтверждения</span>
+                </div>
+                <div class="deal-header-chevron">›</div>
             </div>
 
             <div class="deal-view-content">
-                <div class="deal-user-card">
-                    <h3 id="dealUserName">Пользователь</h3>
-                    <p id="dealUsername">@username</p>
-                </div>
-
-                <div class="deal-info-card">
-                    <div class="deal-info-row">
-                        <span class="deal-info-label">Обмен</span>
-                        <span class="deal-info-value" id="dealPair">USD → KZT</span>
-                    </div>
-                    <div class="deal-info-row">
-                        <span class="deal-info-label">Сумма</span>
-                        <span class="deal-info-value" id="dealAmount">1000 USD</span>
-                    </div>
-                    <div class="deal-info-row">
-                        <span class="deal-info-label">Курс</span>
-                        <span class="deal-info-value" id="dealRate">480</span>
-                    </div>
-                    <div class="deal-info-row">
-                        <span class="deal-info-label">Город</span>
-                        <span class="deal-info-value" id="dealCity">Алматы</span>
-                    </div>
-                    <div class="deal-info-row">
-                        <span class="deal-info-label">Способ</span>
-                        <span class="deal-info-value" id="dealMethod">Перевод</span>
-                    </div>
-                </div>
-
-                <div id="dealStatus"></div>
-
                 <div class="deal-chat">
-                    <div class="chat-header">
-                        <h3>Чат сделки</h3>
-                    </div>
                     <div class="chat-messages" id="chatMessages"></div>
                     <div class="chat-input-container">
                         <input type="file" id="chatFileInput" class="chat-file-input" accept="image/*">
@@ -325,14 +296,6 @@
                     </div>
                 </div>
 
-                <div class="deal-actions">
-                    <button class="btn-success" id="completeDealBtn" onclick="completeDeal()">Сделка завершена</button>
-                    <button class="btn-danger" onclick="reportDeal()">Пожаловаться</button>
-                </div>
-
-                <div class="deal-disclaimer">
-                    <p><strong>Важно:</strong> Перевод средств осуществляется напрямую между пользователями вне сервиса.</p>
-                </div>
             </div>
         </div>
 
@@ -485,6 +448,64 @@
                 <h2 id="modalTitle">Политика</h2>
             </div>
             <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Deal Info Sheet -->
+    <div id="dealInfoSheet" class="bottom-sheet">
+        <div class="bottom-sheet-overlay" onclick="closeDealInfo()"></div>
+        <div class="bottom-sheet-content">
+            <div class="bottom-sheet-handle"></div>
+
+            <div class="deal-info-header">
+                <div class="deal-info-avatar" id="dealInfoAvatar">П</div>
+                <div class="deal-info-user">
+                    <h3 id="dealInfoName">Пользователь</h3>
+                    <p id="dealInfoUsername">@username</p>
+                </div>
+            </div>
+
+            <div class="deal-info-details">
+                <div class="deal-info-row">
+                    <span class="deal-info-label">Обмен</span>
+                    <span class="deal-info-value" id="dealInfoPair">USD → KZT</span>
+                </div>
+                <div class="deal-info-row">
+                    <span class="deal-info-label">Сумма</span>
+                    <span class="deal-info-value" id="dealInfoAmount">1000 USD</span>
+                </div>
+                <div class="deal-info-row">
+                    <span class="deal-info-label">Курс</span>
+                    <span class="deal-info-value" id="dealInfoRate">480</span>
+                </div>
+                <div class="deal-info-row">
+                    <span class="deal-info-label">Город</span>
+                    <span class="deal-info-value" id="dealInfoCity">Алматы</span>
+                </div>
+                <div class="deal-info-row">
+                    <span class="deal-info-label">Способ</span>
+                    <span class="deal-info-value" id="dealInfoMethod">Перевод</span>
+                </div>
+                <div class="deal-info-row">
+                    <span class="deal-info-label">Статус</span>
+                    <span class="deal-info-value deal-status-badge" id="dealInfoStatus">Ожидает</span>
+                </div>
+            </div>
+
+            <div class="deal-info-actions">
+                <button class="btn-deal-complete" onclick="completeDeal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Завершить сделку
+                </button>
+                <button class="btn-deal-report" onclick="reportDeal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Пожаловаться
+                </button>
+            </div>
         </div>
     </div>
 
