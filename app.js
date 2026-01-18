@@ -10,7 +10,7 @@ const CONFIG = {
 const firebaseConfig = {
     apiKey: "AIzaSyA8Eq2hppanj6TrvnD8PwU0d6sQO5y3gSc",
     authDomain: "dsklfmp.firebaseapp.com",
-    databaseURL: "https://dsklfmp-default-rtdb.firebaseio.com",
+    databaseURL: "https://dsklfmp-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "dsklfmp",
     storageBucket: "dsklfmp.firebasestorage.app",
     messagingSenderId: "907843304934",
@@ -41,11 +41,17 @@ const tg = window.Telegram?.WebApp;
 
 document.addEventListener('DOMContentLoaded', () => {
     initTelegram();
-    loadState();
     initEventListeners();
 
-    if (localStorage.getItem('policyAccepted')) {
+    // Check policy acceptance
+    const policyAccepted = localStorage.getItem('policyAccepted');
+    if (policyAccepted === 'true') {
         showMainApp();
+        loadState();
+    } else {
+        // Show welcome screen
+        document.getElementById('welcomeScreen').classList.add('active');
+        document.getElementById('mainApp').classList.remove('active');
     }
 });
 
@@ -67,11 +73,18 @@ function initTelegram() {
     }
 
     if (!state.user) {
+        // Get or create stable demo user ID
+        let demoId = localStorage.getItem('demo_user_id');
+        if (!demoId) {
+            demoId = 'demo_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('demo_user_id', demoId);
+        }
+
         state.user = {
-            id: 'user_demo_' + Date.now(),
-            telegram_id: Date.now(),
-            name: 'Демо Пользователь',
-            username: 'demo_user',
+            id: 'user_' + demoId,
+            telegram_id: demoId,
+            name: 'Пользователь',
+            username: demoId,
             deals: 0,
             rating: 5.0
         };
@@ -97,11 +110,19 @@ function saveUserToStorage() {
 }
 
 function loadState() {
+    // Always load from localStorage first
+    loadFromLocalStorage();
+
     if (db) {
         // Firebase real-time sync
         db.ref('offers').on('value', (snapshot) => {
             const data = snapshot.val();
-            state.allOffers = data ? Object.values(data) : [];
+            if (data) {
+                state.allOffers = Object.values(data);
+            }
+            renderOffers();
+        }, (error) => {
+            console.error('Firebase offers error:', error);
             renderOffers();
         });
 
@@ -112,9 +133,31 @@ function loadState() {
                 state.myDeals = allDeals.filter(d =>
                     d.responder_user_id === state.user?.id || d.offer_user_id === state.user?.id
                 );
-                renderMyDeals();
             }
+            renderMyDeals();
+        }, (error) => {
+            console.error('Firebase deals error:', error);
+            renderMyDeals();
         });
+    } else {
+        renderOffers();
+        renderMyDeals();
+    }
+}
+
+function loadFromLocalStorage() {
+    try {
+        const savedOffers = localStorage.getItem('p2p_offers');
+        if (savedOffers) {
+            state.allOffers = JSON.parse(savedOffers);
+        }
+
+        const savedDeals = localStorage.getItem('p2p_deals');
+        if (savedDeals) {
+            state.myDeals = JSON.parse(savedDeals);
+        }
+    } catch (e) {
+        console.error('LocalStorage error:', e);
     }
 }
 
@@ -123,7 +166,9 @@ function syncData() {
 }
 
 function saveState() {
-    // Individual saves handled by Firebase
+    // Save to localStorage as backup
+    localStorage.setItem('p2p_offers', JSON.stringify(state.allOffers));
+    localStorage.setItem('p2p_deals', JSON.stringify(state.myDeals));
 }
 
 function initEventListeners() {
@@ -137,7 +182,18 @@ function initEventListeners() {
     startBtn?.addEventListener('click', () => {
         localStorage.setItem('policyAccepted', 'true');
         showMainApp();
+        loadState();
     });
+
+    // Кнопка создания заявки
+    const submitOfferBtn = document.getElementById('submitOfferBtn');
+    if (submitOfferBtn) {
+        submitOfferBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Submit offer button clicked');
+            createOffer();
+        });
+    }
 }
 
 // ========== MAIN APP ==========
@@ -327,60 +383,96 @@ function populatePaymentMethodSelect() {
 }
 
 function createOffer() {
-    const fromCurrency = document.getElementById('offerFromCurrency').value;
-    const toCurrency = document.getElementById('offerToCurrency').value;
-    const amount = parseFloat(document.getElementById('offerAmount').value);
-    const rate = parseFloat(document.getElementById('offerRate').value);
-    const city = document.getElementById('offerCity').value;
-    const paymentMethod = document.getElementById('offerPaymentMethod').value;
+    try {
+        console.log('createOffer called');
+        console.log('state.user:', state.user);
 
-    if (!amount || amount <= 0) {
-        showToast('Введите сумму', 'error');
-        return;
+        if (!state.user) {
+            alert('Ошибка: пользователь не инициализирован');
+            return;
+        }
+
+        const fromCurrency = document.getElementById('offerFromCurrency')?.value;
+        const toCurrency = document.getElementById('offerToCurrency')?.value;
+        const amount = parseFloat(document.getElementById('offerAmount')?.value || 0);
+        const rate = parseFloat(document.getElementById('offerRate')?.value || 0);
+        const city = document.getElementById('offerCity')?.value;
+        const paymentMethod = document.getElementById('offerPaymentMethod')?.value;
+
+        console.log('Form values:', { fromCurrency, toCurrency, amount, rate, city, paymentMethod });
+
+        if (!amount || amount <= 0) {
+            showToast('Введите сумму', 'error');
+            return;
+        }
+
+        if (!rate || rate <= 0) {
+            showToast('Введите курс', 'error');
+            return;
+        }
+
+        if (fromCurrency === toCurrency) {
+            showToast('Выберите разные валюты', 'error');
+            return;
+        }
+
+        const offer = {
+            id: 'offer_' + Date.now() + '_' + state.user.id,
+            user_id: state.user.id,
+            user_name: state.user.name,
+            username: state.user.username,
+            from_currency: fromCurrency,
+            to_currency: toCurrency,
+            amount,
+            rate,
+            city,
+            payment_method: paymentMethod,
+            rating: state.user.rating,
+            deals: state.user.deals,
+            created_at: Math.floor(Date.now() / 1000),
+            status: 'active'
+        };
+
+        console.log('Creating offer:', offer);
+
+        if (db) {
+            db.ref('offers/' + offer.id).set(offer).then(() => {
+                console.log('Offer saved to Firebase');
+                closeModal('createOfferModal');
+                showToast('Заявка создана', 'success');
+                switchView('offers');
+            }).catch(err => {
+                console.error('Firebase error:', err);
+                saveOfferLocally(offer);
+            });
+        } else {
+            console.log('No Firebase, saving locally');
+            saveOfferLocally(offer);
+        }
+    } catch (err) {
+        console.error('createOffer error:', err);
+        alert('Ошибка: ' + err.message);
+    }
+}
+
+function saveOfferLocally(offer) {
+    console.log('saveOfferLocally called');
+    state.allOffers.unshift(offer);
+
+    try {
+        const saved = localStorage.getItem('p2p_offers') || '[]';
+        const offers = JSON.parse(saved);
+        offers.unshift(offer);
+        localStorage.setItem('p2p_offers', JSON.stringify(offers));
+        console.log('Offer saved to localStorage');
+    } catch (e) {
+        console.error('localStorage error:', e);
     }
 
-    if (!rate || rate <= 0) {
-        showToast('Введите курс', 'error');
-        return;
-    }
-
-    if (fromCurrency === toCurrency) {
-        showToast('Выберите разные валюты', 'error');
-        return;
-    }
-
-    const offer = {
-        id: 'offer_' + Date.now() + '_' + state.user.id,
-        user_id: state.user.id,
-        user_name: state.user.name,
-        username: state.user.username,
-        from_currency: fromCurrency,
-        to_currency: toCurrency,
-        amount,
-        rate,
-        city,
-        payment_method: paymentMethod,
-        rating: state.user.rating,
-        deals: state.user.deals,
-        created_at: Math.floor(Date.now() / 1000),
-        status: 'active'
-    };
-
-    if (db) {
-        db.ref('offers/' + offer.id).set(offer).then(() => {
-            closeModal('createOfferModal');
-            showToast('Заявка создана', 'success');
-            switchView('offers');
-        }).catch(err => {
-            showToast('Ошибка: ' + err.message, 'error');
-        });
-    } else {
-        state.allOffers.unshift(offer);
-        closeModal('createOfferModal');
-        showToast('Заявка создана', 'success');
-        renderOffers();
-        switchView('offers');
-    }
+    closeModal('createOfferModal');
+    showToast('Заявка создана', 'success');
+    renderOffers();
+    switchView('offers');
 }
 
 // ========== OFFERS LIST ==========
