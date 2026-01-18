@@ -1,4 +1,4 @@
-console.log('App.js loaded - v2');
+console.log('App.js loaded - v3');
 
 // ========== CONFIGURATION ==========
 const CONFIG = {
@@ -1142,9 +1142,15 @@ function showConfirm(title, text, callback) {
     console.log('confirmDialog active');
     confirmCallback = callback;
 
-    document.getElementById('confirmBtn').onclick = () => {
+    const btn = document.getElementById('confirmBtn');
+    console.log('confirmBtn element:', btn);
+    btn.onclick = () => {
+        console.log('confirmBtn clicked!');
         closeConfirm();
-        if (confirmCallback) confirmCallback();
+        if (confirmCallback) {
+            console.log('Calling callback...');
+            confirmCallback();
+        }
     };
 }
 
