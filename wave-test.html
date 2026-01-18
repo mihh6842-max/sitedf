@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Lines Preview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .wave-background {
+            position: fixed;
+            inset: 0;
+            background: #f9fafb;
+            overflow: hidden;
+        }
+
+        .wave-container {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            left: 0;
+            bottom: 0;
+        }
+
+        .wave-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            bottom: 0;
+        }
+
+        .wave-layer svg {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            bottom: 0;
+        }
+
+        .wave-layer svg:first-child { left: 0; }
+        .wave-layer svg:last-child { left: 50%; }
+
+        .wave-layer-1 { animation: wave-scroll 60s linear infinite; }
+        .wave-layer-2 { animation: wave-scroll 45s linear infinite; }
+        .wave-layer-3 { animation: wave-scroll 55s linear infinite; }
+
+        @keyframes wave-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Demo */
+        .demo-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            text-align: center;
+        }
+
+        .demo-card h1 {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 28px;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .demo-card p {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .demo-btn {
+            margin-top: 24px;
+            padding: 14px 32px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="wave-background">
+        <div class="wave-container">
+            <!-- Layer 1 - очень тонкая -->
+            <div class="wave-layer wave-layer-1">
+                <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path d="M0,220 C360,180 720,260 1080,220 C1260,200 1440,240 1440,220 L1440,320 L0,320 Z" fill="rgba(59, 130, 246, 0.04)"/>
+                </svg>
+                <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path d="M0,220 C360,180 720,260 1080,220 C1260,200 1440,240 1440,220 L1440,320 L0,320 Z" fill="rgba(59, 130, 246, 0.04)"/>
+                </svg>
+            </div>
+
+            <!-- Layer 2 -->
+            <div class="wave-layer wave-layer-2">
+                <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path d="M0,250 C480,210 960,290 1440,250 L1440,320 L0,320 Z" fill="rgba(59, 130, 246, 0.03)"/>
+                </svg>
+                <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path d="M0,250 C480,210 960,290 1440,250 L1440,320 L0,320 Z" fill="rgba(59, 130, 246, 0.03)"/>
+                </svg>
+            </div>
+
+            <!-- Layer 3 - самая тонкая -->
+            <div class="wave-layer wave-layer-3">
+                <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path d="M0,280 C240,260 480,300 720,280 C960,260 1200,300 1440,280 L1440,320 L0,320 Z" fill="rgba(59, 130, 246, 0.025)"/>
+                </svg>
+                <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path d="M0,280 C240,260 480,300 720,280 C960,260 1200,300 1440,280 L1440,320 L0,320 Z" fill="rgba(59, 130, 246, 0.025)"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-content">
+        <div class="demo-card">
+            <h1>P2P Exchange</h1>
+            <p>Минималистичный фон - еле заметные волны внизу экрана</p>
+            <button class="demo-btn">Начать</button>
+        </div>
+    </div>
+</body>
+</html>

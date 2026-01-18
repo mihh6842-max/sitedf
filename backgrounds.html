@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор фона</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            height: 280px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .card-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #1a1a2e;
+            z-index: 10;
+        }
+
+        /* ========== 1. FLOATING CIRCLES ========== */
+        .bg-1 {
+            background: #f0f4f8;
+        }
+        .bg-1 .circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float-circles 20s infinite;
+        }
+        .bg-1 .circle:nth-child(1) { width: 80px; height: 80px; background: #a5b4fc; top: 10%; left: 10%; animation-delay: 0s; }
+        .bg-1 .circle:nth-child(2) { width: 60px; height: 60px; background: #93c5fd; top: 60%; left: 80%; animation-delay: -5s; }
+        .bg-1 .circle:nth-child(3) { width: 100px; height: 100px; background: #c4b5fd; top: 70%; left: 20%; animation-delay: -10s; }
+        .bg-1 .circle:nth-child(4) { width: 50px; height: 50px; background: #a5f3fc; top: 20%; left: 70%; animation-delay: -15s; }
+        .bg-1 .circle:nth-child(5) { width: 70px; height: 70px; background: #fda4af; top: 40%; left: 40%; animation-delay: -7s; }
+
+        @keyframes float-circles {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(30px, -30px) rotate(90deg); }
+            50% { transform: translate(-20px, 20px) rotate(180deg); }
+            75% { transform: translate(20px, 30px) rotate(270deg); }
+        }
+
+        /* ========== 2. GEOMETRIC MESH ========== */
+        .bg-2 {
+            background: #fafafa;
+        }
+        .bg-2 .mesh {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: mesh-move 20s linear infinite;
+        }
+        .bg-2 .dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #6366f1;
+            border-radius: 50%;
+            animation: dot-pulse 3s ease-in-out infinite;
+        }
+        .bg-2 .dot:nth-child(2) { top: 20%; left: 30%; animation-delay: 0.5s; }
+        .bg-2 .dot:nth-child(3) { top: 50%; left: 60%; animation-delay: 1s; }
+        .bg-2 .dot:nth-child(4) { top: 70%; left: 25%; animation-delay: 1.5s; }
+        .bg-2 .dot:nth-child(5) { top: 30%; left: 75%; animation-delay: 2s; }
+
+        @keyframes mesh-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+        @keyframes dot-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        /* ========== 3. WAVE LINES ========== */
+        .bg-3 {
+            background: #f8fafc;
+            overflow: hidden;
+        }
+        .bg-3 .wave {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            left: -50%;
+        }
+        .bg-3 .wave svg {
+            width: 100%;
+            height: 100%;
+        }
+        .bg-3 .wave path {
+            fill: none;
+            stroke-width: 2;
+            animation: wave-flow 8s linear infinite;
+        }
+        .bg-3 .wave:nth-child(1) path { stroke: rgba(59, 130, 246, 0.2); animation-duration: 8s; }
+        .bg-3 .wave:nth-child(2) path { stroke: rgba(99, 102, 241, 0.15); animation-duration: 10s; animation-delay: -2s; }
+        .bg-3 .wave:nth-child(3) path { stroke: rgba(139, 92, 246, 0.1); animation-duration: 12s; animation-delay: -4s; }
+
+        @keyframes wave-flow {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); }
+        }
+
+        /* ========== 4. PARTICLES ========== */
+        .bg-4 {
+            background: #f5f5f5;
+        }
+        .bg-4 .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: particle-rise 10s linear infinite;
+        }
+        .bg-4 .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .bg-4 .particle:nth-child(2) { left: 25%; animation-delay: -2s; }
+        .bg-4 .particle:nth-child(3) { left: 40%; animation-delay: -4s; }
+        .bg-4 .particle:nth-child(4) { left: 55%; animation-delay: -6s; }
+        .bg-4 .particle:nth-child(5) { left: 70%; animation-delay: -8s; }
+        .bg-4 .particle:nth-child(6) { left: 85%; animation-delay: -1s; }
+        .bg-4 .particle:nth-child(7) { left: 15%; animation-delay: -3s; }
+        .bg-4 .particle:nth-child(8) { left: 60%; animation-delay: -5s; }
+
+        @keyframes particle-rise {
+            0% { bottom: -10px; opacity: 0; transform: scale(0); }
+            10% { opacity: 1; transform: scale(1); }
+            90% { opacity: 1; transform: scale(1); }
+            100% { bottom: 110%; opacity: 0; transform: scale(0); }
+        }
+
+        /* ========== 5. MORPHING BLOBS ========== */
+        .bg-5 {
+            background: #fefefe;
+        }
+        .bg-5 .blob {
+            position: absolute;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            opacity: 0.4;
+            animation: morph 15s ease-in-out infinite;
+        }
+        .bg-5 .blob:nth-child(1) { width: 150px; height: 150px; background: #93c5fd; top: 10%; left: 10%; }
+        .bg-5 .blob:nth-child(2) { width: 120px; height: 120px; background: #c4b5fd; top: 50%; left: 60%; animation-delay: -5s; animation-direction: reverse; }
+        .bg-5 .blob:nth-child(3) { width: 100px; height: 100px; background: #a5f3fc; top: 60%; left: 20%; animation-delay: -10s; }
+
+        @keyframes morph {
+            0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: translate(0, 0) rotate(0deg); }
+            25% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; transform: translate(20px, -20px) rotate(90deg); }
+            50% { border-radius: 50% 50% 30% 70% / 50% 70% 30% 50%; transform: translate(-10px, 20px) rotate(180deg); }
+            75% { border-radius: 30% 70% 70% 30% / 70% 30% 50% 50%; transform: translate(15px, 10px) rotate(270deg); }
+        }
+
+        /* ========== 6. DIAGONAL STRIPES ========== */
+        .bg-6 {
+            background: #ffffff;
+        }
+        .bg-6 .stripes {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 20px,
+                rgba(59, 130, 246, 0.05) 20px,
+                rgba(59, 130, 246, 0.05) 40px
+            );
+            animation: stripe-move 30s linear infinite;
+        }
+        .bg-6 .accent {
+            position: absolute;
+            width: 3px;
+            height: 60px;
+            background: #3b82f6;
+            opacity: 0.3;
+            transform: rotate(45deg);
+            animation: accent-slide 8s ease-in-out infinite;
+        }
+        .bg-6 .accent:nth-child(2) { top: 20%; left: 30%; animation-delay: -2s; }
+        .bg-6 .accent:nth-child(3) { top: 50%; left: 70%; animation-delay: -4s; }
+        .bg-6 .accent:nth-child(4) { top: 70%; left: 20%; animation-delay: -6s; }
+
+        @keyframes stripe-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 56px 56px; }
+        }
+        @keyframes accent-slide {
+            0%, 100% { transform: rotate(45deg) translateY(0); opacity: 0.3; }
+            50% { transform: rotate(45deg) translateY(-30px); opacity: 0.6; }
+        }
+
+        /* ========== 7. HEXAGON PATTERN ========== */
+        .bg-7 {
+            background: #f9fafb;
+        }
+        .bg-7 .hex-grid {
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cpath fill='%233b82f6' fill-opacity='0.08' d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9z'/%3E%3C/svg%3E");
+            animation: hex-shift 20s linear infinite;
+        }
+        .bg-7 .glow {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: glow-move 12s ease-in-out infinite;
+        }
+        .bg-7 .glow:nth-child(2) { top: 20%; left: 20%; }
+        .bg-7 .glow:nth-child(3) { top: 60%; left: 60%; animation-delay: -6s; }
+
+        @keyframes hex-shift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(28px, 49px); }
+        }
+        @keyframes glow-move {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 30px) scale(1.3); }
+        }
+
+        /* ========== 8. FLOATING SQUARES ========== */
+        .bg-8 {
+            background: #fafbfc;
+        }
+        .bg-8 .square {
+            position: absolute;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            animation: square-float 20s ease-in-out infinite;
+        }
+        .bg-8 .square:nth-child(1) { width: 40px; height: 40px; top: 15%; left: 15%; animation-delay: 0s; }
+        .bg-8 .square:nth-child(2) { width: 60px; height: 60px; top: 60%; left: 70%; animation-delay: -4s; }
+        .bg-8 .square:nth-child(3) { width: 30px; height: 30px; top: 70%; left: 25%; animation-delay: -8s; }
+        .bg-8 .square:nth-child(4) { width: 50px; height: 50px; top: 25%; left: 65%; animation-delay: -12s; }
+        .bg-8 .square:nth-child(5) { width: 35px; height: 35px; top: 45%; left: 40%; animation-delay: -16s; }
+
+        @keyframes square-float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.4; }
+            25% { transform: translate(20px, -20px) rotate(45deg); opacity: 0.7; }
+            50% { transform: translate(-15px, 15px) rotate(90deg); opacity: 0.4; }
+            75% { transform: translate(25px, 10px) rotate(135deg); opacity: 0.7; }
+        }
+
+        /* ========== 9. AURORA LIGHTS ========== */
+        .bg-9 {
+            background: #f8fafc;
+        }
+        .bg-9 .aurora {
+            position: absolute;
+            width: 300%;
+            height: 50%;
+            opacity: 0.3;
+            filter: blur(60px);
+            animation: aurora-flow 15s ease-in-out infinite;
+        }
+        .bg-9 .aurora:nth-child(1) { top: 0; left: -100%; background: #93c5fd; }
+        .bg-9 .aurora:nth-child(2) { top: 30%; left: -50%; background: #c4b5fd; animation-delay: -5s; }
+        .bg-9 .aurora:nth-child(3) { top: 50%; left: -100%; background: #a5f3fc; animation-delay: -10s; }
+
+        @keyframes aurora-flow {
+            0%, 100% { transform: translateX(0) skewX(-15deg); }
+            50% { transform: translateX(30%) skewX(15deg); }
+        }
+
+        /* ========== 10. CONSTELLATION ========== */
+        .bg-10 {
+            background: #f5f7fa;
+        }
+        .bg-10 .star {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: star-twinkle 3s ease-in-out infinite;
+        }
+        .bg-10 .star:nth-child(1) { top: 20%; left: 20%; }
+        .bg-10 .star:nth-child(2) { top: 30%; left: 50%; animation-delay: 0.5s; }
+        .bg-10 .star:nth-child(3) { top: 50%; left: 30%; animation-delay: 1s; }
+        .bg-10 .star:nth-child(4) { top: 40%; left: 70%; animation-delay: 1.5s; }
+        .bg-10 .star:nth-child(5) { top: 60%; left: 55%; animation-delay: 2s; }
+        .bg-10 .star:nth-child(6) { top: 70%; left: 25%; animation-delay: 2.5s; }
+        .bg-10 .star:nth-child(7) { top: 25%; left: 80%; animation-delay: 0.3s; }
+        .bg-10 .line {
+            position: absolute;
+            height: 1px;
+            background: rgba(59, 130, 246, 0.2);
+            transform-origin: left center;
+            animation: line-draw 4s ease-in-out infinite;
+        }
+        .bg-10 .line:nth-child(8) { top: 23%; left: 22%; width: 80px; transform: rotate(20deg); }
+        .bg-10 .line:nth-child(9) { top: 35%; left: 32%; width: 100px; transform: rotate(-30deg); animation-delay: 1s; }
+        .bg-10 .line:nth-child(10) { top: 45%; left: 52%; width: 70px; transform: rotate(45deg); animation-delay: 2s; }
+        .bg-10 .line:nth-child(11) { top: 55%; left: 35%; width: 90px; transform: rotate(-10deg); animation-delay: 1.5s; }
+
+        @keyframes star-twinkle {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+        @keyframes line-draw {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Выбери фон (напиши номер)</h1>
+
+    <div class="grid">
+        <!-- 1. Floating Circles -->
+        <div class="card bg-1">
+            <span class="card-number">1</span>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="card-label">Floating Circles</div>
+        </div>
+
+        <!-- 2. Geometric Mesh -->
+        <div class="card bg-2">
+            <span class="card-number">2</span>
+            <div class="mesh"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="card-label">Geometric Mesh</div>
+        </div>
+
+        <!-- 3. Wave Lines -->
+        <div class="card bg-3">
+            <span class="card-number">3</span>
+            <div class="wave">
+                <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+                    <path d="M0,100 C300,150 600,50 900,100 C1200,150 1500,50 1800,100" />
+                </svg>
+            </div>
+            <div class="wave">
+                <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+                    <path d="M0,120 C300,70 600,170 900,120 C1200,70 1500,170 1800,120" />
+                </svg>
+            </div>
+            <div class="wave">
+                <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+                    <path d="M0,80 C300,130 600,30 900,80 C1200,130 1500,30 1800,80" />
+                </svg>
+            </div>
+            <div class="card-label">Wave Lines</div>
+        </div>
+
+        <!-- 4. Particles -->
+        <div class="card bg-4">
+            <span class="card-number">4</span>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="card-label">Rising Particles</div>
+        </div>
+
+        <!-- 5. Morphing Blobs -->
+        <div class="card bg-5">
+            <span class="card-number">5</span>
+            <div class="blob"></div>
+            <div class="blob"></div>
+            <div class="blob"></div>
+            <div class="card-label">Morphing Blobs</div>
+        </div>
+
+        <!-- 6. Diagonal Stripes -->
+        <div class="card bg-6">
+            <span class="card-number">6</span>
+            <div class="stripes"></div>
+            <div class="accent"></div>
+            <div class="accent"></div>
+            <div class="accent"></div>
+            <div class="card-label">Diagonal Stripes</div>
+        </div>
+
+        <!-- 7. Hexagon Pattern -->
+        <div class="card bg-7">
+            <span class="card-number">7</span>
+            <div class="hex-grid"></div>
+            <div class="glow"></div>
+            <div class="glow"></div>
+            <div class="card-label">Hexagon Grid</div>
+        </div>
+
+        <!-- 8. Floating Squares -->
+        <div class="card bg-8">
+            <span class="card-number">8</span>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="square"></div>
+            <div class="card-label">Floating Squares</div>
+        </div>
+
+        <!-- 9. Aurora Lights -->
+        <div class="card bg-9">
+            <span class="card-number">9</span>
+            <div class="aurora"></div>
+            <div class="aurora"></div>
+            <div class="aurora"></div>
+            <div class="card-label">Aurora Lights</div>
+        </div>
+
+        <!-- 10. Constellation -->
+        <div class="card bg-10">
+            <span class="card-number">10</span>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="card-label">Constellation</div>
+        </div>
+    </div>
+</body>
+</html>
