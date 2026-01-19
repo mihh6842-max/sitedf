@@ -210,18 +210,34 @@
                     </div>
                 </div>
 
-                <div class="info-card">
-                    <div class="info-item">
-                        <span class="info-label">Telegram ID</span>
-                        <span class="info-value" id="profileTelegramId">—</span>
+                <!-- Subscription Card -->
+                <div class="subscription-card" id="subscriptionCard" onclick="showSubscription()">
+                    <div class="subscription-info">
+                        <span class="subscription-badge free" id="subscriptionBadge">FREE</span>
+                        <div class="subscription-text">
+                            <span class="subscription-title">Бесплатный тариф</span>
+                            <span class="subscription-subtitle">3 сделки в день</span>
+                        </div>
                     </div>
+                    <span class="subscription-upgrade">Улучшить ›</span>
                 </div>
 
                 <div class="menu-list">
                     <button class="menu-item" onclick="showMyOffers()">
-                        <span>Мои заявки</span>
+                        <span>📋 Мои заявки</span>
                         <span class="chevron">›</span>
                     </button>
+                    <button class="menu-item" onclick="showPromotionOptions()">
+                        <span>🚀 Продвижение заявок</span>
+                        <span class="chevron">›</span>
+                    </button>
+                    <button class="menu-item" onclick="showDonate()">
+                        <span>☕ Поддержать проект</span>
+                        <span class="chevron">›</span>
+                    </button>
+                </div>
+
+                <div class="menu-list">
                     <button class="menu-item menu-item-danger" onclick="resetData()">
                         <span>Сбросить данные</span>
                         <span class="chevron">›</span>
@@ -505,6 +521,139 @@
                     </svg>
                     Пожаловаться
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div id="subscriptionModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <button class="back-btn" onclick="closeModal('subscriptionModal')">‹</button>
+                <h2>Тарифы</h2>
+            </div>
+            <div class="modal-body">
+                <!-- Free Plan -->
+                <div class="plan-card" id="freePlanCard">
+                    <div class="plan-header">
+                        <span class="plan-badge free">FREE</span>
+                        <span class="plan-price">Бесплатно</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>✓ Создание сделок</li>
+                        <li>✓ Чат внутри сделки</li>
+                        <li>✓ Базовый арбитраж</li>
+                        <li>✓ Рейтинг</li>
+                        <li class="plan-limit">✗ Лимит 3 сделки в день</li>
+                        <li class="plan-limit">✗ Без приоритета в списке</li>
+                    </ul>
+                    <button class="btn-secondary" disabled>Текущий тариф</button>
+                </div>
+
+                <!-- PRO Plan -->
+                <div class="plan-card plan-pro">
+                    <div class="plan-popular">Популярный</div>
+                    <div class="plan-header">
+                        <span class="plan-badge pro">⭐ PRO</span>
+                        <span class="plan-price">5 000 ₸<span class="plan-period">/месяц</span></span>
+                    </div>
+                    <ul class="plan-features">
+                        <li>✓ Всё из бесплатного</li>
+                        <li class="plan-highlight">🔝 Приоритет в списке заявок</li>
+                        <li class="plan-highlight">♻️ Автоповтор объявлений</li>
+                        <li class="plan-highlight">⚡ Быстрое время ожидания</li>
+                        <li class="plan-highlight">⭐ Значок «Проверенный»</li>
+                        <li class="plan-highlight">📊 Статистика сделок</li>
+                        <li class="plan-highlight">🆘 Приоритет в арбитраже</li>
+                        <li>∞ Безлимитные сделки</li>
+                    </ul>
+                    <button class="btn-primary btn-pro" onclick="buyPro()">Оформить PRO</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promotion Modal -->
+    <div id="promotionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="back-btn" onclick="closeModal('promotionModal')">‹</button>
+                <h2>Продвижение</h2>
+            </div>
+            <div class="modal-body">
+                <p class="promo-subtitle">Сделайте вашу заявку заметнее</p>
+
+                <div class="promo-option" onclick="buyPromotion('top')">
+                    <div class="promo-icon">🔝</div>
+                    <div class="promo-info">
+                        <span class="promo-title">Поднять в топ</span>
+                        <span class="promo-desc">Заявка будет первой в списке</span>
+                    </div>
+                    <span class="promo-price">300 ₸</span>
+                </div>
+
+                <div class="promo-option" onclick="buyPromotion('highlight')">
+                    <div class="promo-icon">🔥</div>
+                    <div class="promo-info">
+                        <span class="promo-title">Выделить цветом</span>
+                        <span class="promo-desc">Яркая рамка привлечёт внимание</span>
+                    </div>
+                    <span class="promo-price">200 ₸</span>
+                </div>
+
+                <div class="promo-option" onclick="buyPromotion('pin')">
+                    <div class="promo-icon">📌</div>
+                    <div class="promo-info">
+                        <span class="promo-title">Закрепить на 24 часа</span>
+                        <span class="promo-desc">Всегда в топе целые сутки</span>
+                    </div>
+                    <span class="promo-price">500 ₸</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donate Modal -->
+    <div id="donateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="back-btn" onclick="closeModal('donateModal')">‹</button>
+                <h2>Поддержать проект</h2>
+            </div>
+            <div class="modal-body donate-body">
+                <div class="donate-icon">☕</div>
+                <p class="donate-text">Если вам нравится наш сервис, вы можете поддержать разработку</p>
+
+                <div class="donate-amounts">
+                    <button class="donate-amount" onclick="donate(500)">500 ₸</button>
+                    <button class="donate-amount" onclick="donate(1000)">1 000 ₸</button>
+                    <button class="donate-amount" onclick="donate(2000)">2 000 ₸</button>
+                </div>
+
+                <button class="btn-primary" onclick="donateCustom()">Другая сумма</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Fee Modal (after deal completion) -->
+    <div id="serviceFeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Сервисный сбор</h2>
+            </div>
+            <div class="modal-body">
+                <div class="fee-info">
+                    <p class="fee-title">Для завершения сделки оплатите сервисный сбор</p>
+                    <div class="fee-amount" id="feeAmount">300 ₸</div>
+                </div>
+
+                <p class="fee-disclaimer">
+                    Платёж является оплатой за использование платформы и сервисов сопровождения сделки.
+                    Платформа не участвует в денежных переводах между пользователями.
+                </p>
+
+                <button class="btn-primary" onclick="payServiceFee()">Оплатить</button>
+                <button class="btn-text" onclick="closeModal('serviceFeeModal')">Отменить</button>
             </div>
         </div>
     </div>

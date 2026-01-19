@@ -1,4 +1,4 @@
-console.log('App.js loaded - v4');
+console.log('App.js loaded - v5');
 
 // ========== CONFIGURATION ==========
 const CONFIG = {
@@ -560,7 +560,9 @@ function respondToCurrentOffer() {
 }
 
 function respondToOffer(offerId) {
-    console.log('respondToOffer called, offerId:', offerId);
+    // Проверка лимита для Free пользователей
+    if (!checkDealLimit()) return;
+
     const offer = state.allOffers.find(o => o.id === offerId);
     if (!offer) {
         alert('Заявка не найдена');
@@ -685,20 +687,8 @@ function completeDeal() {
         'Завершить сделку?',
         'Подтвердите, что обмен прошел успешно',
         () => {
-            state.currentDeal.status = 'completed';
-            state.currentDeal.completed_at = Math.floor(Date.now() / 1000);
-            state.user.deals = (state.user.deals || 0) + 1;
-
-            if (db) {
-                db.ref('deals/' + state.currentDeal.id).update({
-                    status: 'completed',
-                    completed_at: state.currentDeal.completed_at
-                });
-            }
-
-            saveUserToStorage();
-            updateDealStatus();
-            showToast('Сделка завершена', 'success');
+            // Показать окно сервисного сбора
+            showServiceFee(state.currentDeal.id);
         }
     );
 }
@@ -1333,8 +1323,144 @@ function formatDate(timestamp) {
     });
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+// ========== SUBSCRIPTION & PAYMENTS ==========
+const PRICES = {
+    pro: 5000,
+    serviceFee: 300,
+    promoTop: 300,
+    promoHighlight: 200,
+    promoPin: 500
+};
+
+function showSubscription() {
+    openModal('subscriptionModal');
+    updateSubscriptionUI();
+}
+
+function updateSubscriptionUI() {
+    const isPro = state.user?.isPro;
+    const badge = document.getElementById('subscriptionBadge');
+    if (isPro && badge) {
+        badge.textContent = '⭐ PRO';
+        badge.className = 'subscription-badge pro';
+        document.querySelector('.subscription-title').textContent = 'PRO-аккаунт';
+        document.querySelector('.subscription-subtitle').textContent = 'Безлимитные сделки';
+        document.querySelector('.subscription-upgrade').textContent = 'Активен ›';
+    }
+}
+
+function buyPro() {
+    initiatePayment('pro', PRICES.pro, 'PRO-подписка на месяц');
+}
+
+function showPromotionOptions() {
+    openModal('promotionModal');
+}
+
+function buyPromotion(type) {
+    const prices = {
+        top: { amount: PRICES.promoTop, name: 'Поднять в топ' },
+        highlight: { amount: PRICES.promoHighlight, name: 'Выделить цветом' },
+        pin: { amount: PRICES.promoPin, name: 'Закрепить на 24 часа' }
+    };
+    const promo = prices[type];
+    closeModal('promotionModal');
+    initiatePayment('promo_' + type, promo.amount, promo.name);
+}
+
+function showDonate() {
+    openModal('donateModal');
+}
+
+function donate(amount) {
+    closeModal('donateModal');
+    initiatePayment('donate', amount, 'Донат ' + amount + ' ₸');
+}
+
+function donateCustom() {
+    const amount = prompt('Введите сумму в тенге:');
+    if (amount && !isNaN(amount) && parseInt(amount) > 0) {
+        closeModal('donateModal');
+        initiatePayment('donate', parseInt(amount), 'Донат');
+    }
+}
+
+function showServiceFee(dealId) {
+    state.pendingFeeDealId = dealId;
+    document.getElementById('feeAmount').textContent = PRICES.serviceFee + ' ₸';
+    openModal('serviceFeeModal');
+}
+
+function payServiceFee() {
+    closeModal('serviceFeeModal');
+    initiatePayment('service_fee', PRICES.serviceFee, 'Сервисный сбор');
+}
+
+function initiatePayment(type, amount, description) {
+    showConfirm(
+        'Оплата: ' + description,
+        'Сумма: ' + amount + ' ₸\n\nПерейти к оплате?',
+        () => processPayment(type, amount)
+    );
+}
+
+function processPayment(type, amount) {
+    showToast('Переход к оплате...');
+    // TODO: YooKassa интеграция
+    setTimeout(() => onPaymentSuccess(type, amount), 1500);
+}
+
+function onPaymentSuccess(type, amount) {
+    if (type === 'pro') {
+        state.user.isPro = true;
+        state.user.proExpiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        saveUserToStorage();
+        updateSubscriptionUI();
+        showToast('PRO-аккаунт активирован!', 'success');
+    } else if (type === 'service_fee') {
+        finalizeDealAfterFee();
+    } else if (type.startsWith('promo_')) {
+        applyPromotion(type.replace('promo_', ''));
+    } else if (type === 'donate') {
+        showToast('Спасибо за поддержку!', 'success');
+    }
+}
+
+function finalizeDealAfterFee() {
+    if (state.currentDeal) {
+        state.currentDeal.status = 'completed';
+        state.user.deals = (state.user.deals || 0) + 1;
+        if (db) {
+            db.ref('deals/' + state.currentDeal.id).update({ status: 'completed', feePaid: true });
+        }
+        saveUserToStorage();
+        updateDealStatus();
+        showToast('Сделка завершена!', 'success');
+    }
+}
+
+function applyPromotion(type) {
+    const myOffer = state.allOffers.find(o => o.user_id === state.user.id && o.status === 'active');
+    if (!myOffer) {
+        showToast('У вас нет активных заявок', 'error');
+        return;
+    }
+    const updates = {};
+    if (type === 'top') updates.boostedAt = Date.now();
+    if (type === 'highlight') { updates.highlighted = true; updates.highlightedUntil = Date.now() + 86400000; }
+    if (type === 'pin') { updates.pinned = true; updates.pinnedUntil = Date.now() + 86400000; }
+    Object.assign(myOffer, updates);
+    if (db) db.ref('offers/' + myOffer.id).update(updates);
+    showToast('Продвижение применено!', 'success');
+}
+
+function checkDealLimit() {
+    if (state.user?.isPro) return true;
+    const today = new Date().toDateString();
+    const todayDeals = state.myDeals.filter(d => new Date(d.created_at * 1000).toDateString() === today).length;
+    if (todayDeals >= 3) {
+        showConfirm('Лимит сделок', 'Вы достигли лимита 3 сделки в день. Оформите PRO!', () => showSubscription());
+        return false;
+    }
+    return true;
 }

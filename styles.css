@@ -2133,3 +2133,326 @@ body {
     transform: scale(0.98);
     background: rgba(239, 68, 68, 0.1);
 }
+
+/* ========== SUBSCRIPTION ========== */
+.subscription-card {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 16px;
+    padding: 18px;
+    margin: 0 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.subscription-card:active {
+    transform: scale(0.98);
+}
+
+.subscription-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.subscription-badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.subscription-badge.free {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.subscription-badge.pro {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1e293b;
+}
+
+.subscription-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.subscription-title {
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.subscription-subtitle {
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+}
+
+.subscription-upgrade {
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* ========== PLAN CARDS ========== */
+.modal-large .modal-body {
+    padding: 20px;
+}
+
+.plan-card {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 16px;
+    border: 2px solid var(--border);
+}
+
+.plan-card.plan-pro {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+    border-color: var(--primary);
+    position: relative;
+}
+
+.plan-popular {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.plan-badge {
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.plan-badge.free {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.plan-badge.pro {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1e293b;
+}
+
+.plan-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.plan-period {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.plan-features {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.plan-features li {
+    padding: 10px 0;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
+}
+
+.plan-features li:last-child {
+    border-bottom: none;
+}
+
+.plan-features .plan-limit {
+    color: var(--text-tertiary);
+}
+
+.plan-features .plan-highlight {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.btn-pro {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+
+/* ========== PROMOTION ========== */
+.promo-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.promo-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.promo-option:active {
+    transform: scale(0.98);
+    border-color: var(--primary);
+}
+
+.promo-icon {
+    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card);
+    border-radius: 12px;
+}
+
+.promo-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.promo-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.promo-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.promo-price {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--primary);
+}
+
+/* ========== DONATE ========== */
+.donate-body {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.donate-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.donate-text {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.donate-amounts {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.donate-amount {
+    flex: 1;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.donate-amount:active {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* ========== SERVICE FEE ========== */
+.fee-info {
+    text-align: center;
+    padding: 24px;
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+.fee-title {
+    color: var(--text-primary);
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.fee-amount {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.fee-disclaimer {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.btn-text {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+/* ========== PRO BADGE IN OFFERS ========== */
+.offer-pro-badge {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1e293b;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-left: 8px;
+}
+
+.offer-card.highlighted {
+    border: 2px solid #f59e0b;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(245, 158, 11, 0.05));
+}
+
+.offer-card.pinned::before {
+    content: '📌';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 16px;
+}
