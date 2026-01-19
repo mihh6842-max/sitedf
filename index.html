@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>P2P Exchange</title>
+    <title>P2P Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -38,8 +38,8 @@
                     <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <h1>P2P Exchange</h1>
-            <p class="welcome-desc">Безопасная площадка для обмена валют</p>
+            <h1>P2P Platform</h1>
+            <p class="welcome-desc">Площадка для P2P сделок</p>
 
             <div class="features">
                 <div class="feature">
@@ -50,7 +50,7 @@
                     </div>
                     <div class="feature-text">
                         <h3>Создавайте заявки</h3>
-                        <p>Публикуйте предложения об обмене валют</p>
+                        <p>Публикуйте заявки на P2P сделки</p>
                     </div>
                 </div>
 
@@ -100,7 +100,7 @@
     <div id="mainApp" class="screen">
         <!-- Header -->
         <header class="app-header">
-            <h1 id="headerTitle">P2P Exchange</h1>
+            <h1 id="headerTitle">P2P Platform</h1>
         </header>
 
         <!-- Home View -->
@@ -128,7 +128,7 @@
                             </svg>
                         </div>
                         <div class="action-text">
-                            <h3>Найти обмен</h3>
+                            <h3>Найти сделку</h3>
                             <p>Просмотреть заявки</p>
                         </div>
                     </button>
@@ -143,7 +143,7 @@
                         </div>
                         <div class="action-text">
                             <h3>Мои сделки</h3>
-                            <p>История обменов</p>
+                            <p>История сделок</p>
                         </div>
                     </button>
 
@@ -183,8 +183,8 @@
             <div id="myDealsList" class="deals-list"></div>
             <div id="emptyDeals" class="empty-state">
                 <h3>Нет сделок</h3>
-                <p>Откликнитесь на заявку для начала обмена</p>
-                <button class="btn-primary" onclick="switchView('offers')">Найти обмен</button>
+                <p>Откликнитесь на заявку для начала сделки</p>
+                <button class="btn-primary" onclick="switchView('offers')">Найти сделку</button>
             </div>
         </div>
 
@@ -399,7 +399,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button class="back-btn" onclick="closeModal('viewOfferModal')">‹</button>
-                <h2>Заявка на обмен</h2>
+                <h2>Детали заявки</h2>
             </div>
             <div class="modal-body">
                 <div class="offer-user-info">
@@ -409,7 +409,7 @@
 
                 <div class="offer-details-view">
                     <div class="offer-detail-row">
-                        <span>Обмен</span>
+                        <span>Направление</span>
                         <strong id="viewOfferPair">USD → KZT</strong>
                     </div>
                     <div class="offer-detail-row">
@@ -483,7 +483,7 @@
 
             <div class="deal-info-details">
                 <div class="deal-info-row">
-                    <span class="deal-info-label">Обмен</span>
+                    <span class="deal-info-label">Направление</span>
                     <span class="deal-info-value" id="dealInfoPair">USD → KZT</span>
                 </div>
                 <div class="deal-info-row">
