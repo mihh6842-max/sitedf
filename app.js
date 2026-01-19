@@ -1,4 +1,4 @@
-console.log('App.js loaded - v5');
+console.log('App.js loaded - v7');
 
 // ========== CONFIGURATION ==========
 const CONFIG = {
@@ -246,9 +246,9 @@ function updateProfile() {
     document.getElementById('profileAvatar').textContent = avatar;
     document.getElementById('profileName').textContent = state.user.name;
     document.getElementById('profileUsername').textContent = '@' + state.user.username;
-    document.getElementById('profileTelegramId').textContent = state.user.id;
     document.getElementById('profileDeals').textContent = state.user.deals || 0;
     document.getElementById('profileRating').textContent = state.user.rating?.toFixed(1) || '5.0';
+    updateSubscriptionUI();
 }
 
 // ========== EXCHANGE RATES ==========
@@ -1457,7 +1457,8 @@ function applyPromotion(type) {
 function checkDealLimit() {
     if (state.user?.isPro) return true;
     const today = new Date().toDateString();
-    const todayDeals = state.myDeals.filter(d => new Date(d.created_at * 1000).toDateString() === today).length;
+    const myDeals = state.myDeals || [];
+    const todayDeals = myDeals.filter(d => new Date(d.created_at * 1000).toDateString() === today).length;
     if (todayDeals >= 3) {
         showConfirm('Лимит сделок', 'Вы достигли лимита 3 сделки в день. Оформите PRO!', () => showSubscription());
         return false;
