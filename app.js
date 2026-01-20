@@ -1,4 +1,4 @@
-console.log('App.js loaded - v15');
+console.log('App.js loaded - v16');
 
 // ========== CONFIGURATION ==========
 const CONFIG = {
@@ -449,7 +449,7 @@ function renderNewsModal() {
         const views = news.views || Math.floor(Math.random() * 500 + 100);
 
         return `
-            <div class="news-post">
+            <div class="news-post" oncontextmenu="showNewsMenu(event, '${news.id}')" ontouchstart="startNewsHold('${news.id}')" ontouchend="endNewsHold()">
                 <div class="news-post-header">
                     <div class="news-post-avatar">📢</div>
                     <div class="news-post-meta">
@@ -457,6 +457,7 @@ function renderNewsModal() {
                         <div class="news-post-time">${timeStr}</div>
                     </div>
                     ${news.pinned ? '<span class="news-post-pin">📌</span>' : ''}
+                    ${isAdminUnlocked ? `<button class="news-delete-btn" onclick="deleteNews('${news.id}')">🗑</button>` : ''}
                 </div>
                 <div class="news-post-content">
                     <div class="news-post-title">${escapeHtml(news.title)}</div>
@@ -1833,43 +1834,80 @@ function formatTimeAgo(timestamp) {
     return Math.floor(diff / 86400000) + ' дн назад';
 }
 
+let newsImageData = null;
+
 function showAddNewsForm() {
     openModal('addNewsModal');
+    newsImageData = null;
+    document.getElementById('newsTitle').value = '';
+    document.getElementById('newsText').value = '';
+    document.getElementById('newsPinned').checked = false;
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+    document.getElementById('previewImage').style.display = 'none';
+    updatePreview();
+}
+
+function updatePreview() {
+    const title = document.getElementById('newsTitle').value || 'Заголовок';
+    const text = document.getElementById('newsText').value || 'Текст новости...';
+    document.getElementById('previewTitle').textContent = title;
+    document.getElementById('previewText').textContent = text;
+}
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        newsImageData = e.target.result;
+        document.getElementById('uploadedImagePreview').src = newsImageData;
+        document.getElementById('imagePreviewContainer').style.display = 'block';
+        document.getElementById('previewImage').src = newsImageData;
+        document.getElementById('previewImage').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeImage() {
+    newsImageData = null;
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+    document.getElementById('previewImage').style.display = 'none';
+    document.getElementById('newsImageInput').value = '';
 }
 
 function publishNews() {
-    const type = document.getElementById('newsType').value;
     const title = document.getElementById('newsTitle').value.trim();
     const text = document.getElementById('newsText').value.trim();
     const pinned = document.getElementById('newsPinned').checked;
 
     if (!title || !text) {
-        showToast('Заполните все поля', 'error');
+        showToast('Заполни заголовок и текст', 'error');
         return;
     }
 
     const news = {
-        type,
         title,
         text,
         pinned,
-        created_at: Math.floor(Date.now() / 1000)
+        image: newsImageData || null,
+        created_at: Math.floor(Date.now() / 1000),
+        views: 0
     };
 
     if (db) {
         db.ref('news').push(news).then(() => {
-            showToast('Новость опубликована', 'success');
+            showToast('Опубликовано! 🚀', 'success');
             closeModal('addNewsModal');
-            document.getElementById('newsTitle').value = '';
-            document.getElementById('newsText').value = '';
-            document.getElementById('newsPinned').checked = false;
+            newsImageData = null;
         });
     } else {
         newsData.unshift({ id: 'local_' + Date.now(), ...news });
-        renderNews();
+        updateNewsBanner();
         renderAdminNews();
-        showToast('Новость добавлена (локально)', 'success');
+        showToast('Добавлено локально', 'success');
         closeModal('addNewsModal');
+        newsImageData = null;
     }
 }
 

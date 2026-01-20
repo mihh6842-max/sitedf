@@ -772,37 +772,65 @@
 
     <!-- Add News Modal -->
     <div id="addNewsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="back-btn" onclick="closeModal('addNewsModal')">‹</button>
-                <h2>Новая новость</h2>
+        <div class="modal-content modal-fullscreen">
+            <div class="modal-header news-modal-header">
+                <button class="back-btn news-back" onclick="closeModal('addNewsModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="news-channel-info">
+                    <span class="news-channel-name">✏️ Новый пост</span>
+                    <span class="news-channel-subs">Админ-панель</span>
+                </div>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Тип</label>
-                    <select id="newsType" class="form-select">
-                        <option value="update">🚀 Обновление</option>
-                        <option value="info">ℹ️ Информация</option>
-                        <option value="promo">🎁 Акция</option>
-                        <option value="warning">⚠️ Важно</option>
-                    </select>
+            <div class="modal-body news-editor">
+                <!-- Preview -->
+                <div class="news-preview" id="newsPreview">
+                    <div class="news-post">
+                        <div class="news-post-header">
+                            <div class="news-post-avatar">📢</div>
+                            <div class="news-post-meta">
+                                <div class="news-post-channel">P2P Platform</div>
+                                <div class="news-post-time">сейчас</div>
+                            </div>
+                        </div>
+                        <div class="news-post-content">
+                            <div class="news-post-title" id="previewTitle">Заголовок</div>
+                            <div class="news-post-text" id="previewText">Текст новости...</div>
+                            <img id="previewImage" class="news-post-image" style="display:none">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Заголовок</label>
-                    <input type="text" id="newsTitle" class="form-input" placeholder="Заголовок новости">
+
+                <!-- Editor -->
+                <div class="news-form">
+                    <input type="text" id="newsTitle" class="news-input" placeholder="Заголовок" oninput="updatePreview()">
+                    <textarea id="newsText" class="news-textarea" rows="5" placeholder="Текст сообщения..." oninput="updatePreview()"></textarea>
+
+                    <div class="news-image-upload" onclick="document.getElementById('newsImageInput').click()">
+                        <span id="imageUploadText">📷 Добавить фото</span>
+                        <input type="file" id="newsImageInput" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+                    </div>
+                    <div id="imagePreviewContainer" style="display:none">
+                        <img id="uploadedImagePreview" class="uploaded-preview">
+                        <button class="remove-image" onclick="removeImage()">✕</button>
+                    </div>
+
+                    <div class="news-options">
+                        <label class="news-option">
+                            <input type="checkbox" id="newsPinned">
+                            <span>📌 Закрепить</span>
+                        </label>
+                    </div>
+
+                    <button class="btn-publish" onclick="publishNews()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Опубликовать
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label>Текст</label>
-                    <textarea id="newsText" class="form-textarea" rows="4" placeholder="Текст новости"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="newsPinned">
-                        <span class="checkmark"></span>
-                        <span>Закрепить новость</span>
-                    </label>
-                </div>
-                <button class="btn-primary" onclick="publishNews()">Опубликовать</button>
             </div>
         </div>
     </div>
