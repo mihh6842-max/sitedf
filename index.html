@@ -837,6 +837,27 @@
         </div>
     </div>
 
+    <!-- Comments Modal -->
+    <div id="commentsModal" class="modal">
+        <div class="modal-content modal-fullscreen">
+            <div class="modal-header">
+                <button class="back-btn" onclick="closeModal('commentsModal')">‹</button>
+                <h2>💬 Комментарии</h2>
+            </div>
+            <div class="modal-body comments-body">
+                <div id="commentsList" class="comments-list"></div>
+                <div class="comments-input-container">
+                    <input type="text" id="commentInput" class="comment-input" placeholder="Написать комментарий..." maxlength="500">
+                    <button class="comment-send-btn" onclick="sendComment()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div id="toast" class="toast"></div>
 

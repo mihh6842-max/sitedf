@@ -427,6 +427,17 @@ function openNewsModal() {
     renderNewsModal();
     localStorage.setItem('lastNewsSeenAt', Date.now().toString());
     updateNewsBanner();
+    incrementNewsViews();
+}
+
+function incrementNewsViews() {
+    if (!db) return;
+    newsData.forEach(news => {
+        const viewsRef = db.ref('news/' + news.id + '/views');
+        viewsRef.transaction((current) => {
+            return (current || 0) + 1;
+        });
+    });
 }
 
 function renderNewsModal() {
@@ -446,8 +457,8 @@ function renderNewsModal() {
     container.innerHTML = newsData.map(news => {
         const date = new Date(news.created_at * 1000);
         const timeStr = formatNewsTime(date);
-        const views = news.views || Math.floor(Math.random() * 500 + 100);
-        const comments = news.comments || 0;
+        const views = news.views || 0;
+        const commentsCount = news.commentsData ? Object.keys(news.commentsData).length : 0;
 
         return `
             <div class="news-item">
@@ -470,7 +481,7 @@ function renderNewsModal() {
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <span>${comments} комментариев</span>
+                        <span>${commentsCount} комментариев</span>
                     </button>
                 </div>
             </div>
@@ -491,8 +502,107 @@ function formatNewsTime(date) {
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 }
 
+let currentNewsId = null;
+
 function openComments(newsId) {
-    showToast('Комментарии скоро будут доступны');
+    currentNewsId = newsId;
+    openModal('commentsModal');
+    loadComments(newsId);
+}
+
+function loadComments(newsId) {
+    if (!db) return;
+
+    const commentsRef = db.ref('news/' + newsId + '/commentsData');
+    commentsRef.on('value', (snapshot) => {
+        const comments = snapshot.val() || {};
+        renderComments(comments);
+    });
+}
+
+function renderComments(comments) {
+    const container = document.getElementById('commentsList');
+    if (!container) return;
+
+    const commentsArray = Object.entries(comments).map(([id, comment]) => ({
+        id,
+        ...comment
+    })).sort((a, b) => a.timestamp - b.timestamp);
+
+    if (commentsArray.length === 0) {
+        container.innerHTML = `
+            <div class="comments-empty">
+                <div class="comments-empty-icon">💬</div>
+                <div>Нет комментариев</div>
+                <div class="comments-empty-text">Будьте первым!</div>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = commentsArray.map(comment => {
+        const date = new Date(comment.timestamp);
+        const timeStr = formatCommentTime(date);
+
+        return `
+            <div class="comment-item">
+                <div class="comment-avatar">${comment.userName.charAt(0).toUpperCase()}</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-name">${escapeHtml(comment.userName)}</span>
+                        <span class="comment-time">${timeStr}</span>
+                    </div>
+                    <div class="comment-text">${escapeHtml(comment.text)}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Scroll to bottom
+    setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+    }, 100);
+}
+
+function formatCommentTime(date) {
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'только что';
+    if (minutes < 60) return `${minutes} мин назад`;
+    if (hours < 24) return `${hours} ч назад`;
+    if (days < 7) return `${days} дн назад`;
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+}
+
+function sendComment() {
+    const input = document.getElementById('commentInput');
+    const text = input.value.trim();
+
+    if (!text) {
+        showToast('Введите комментарий');
+        return;
+    }
+
+    if (!db || !currentNewsId) return;
+
+    const comment = {
+        text: text,
+        userName: state.user.name,
+        userId: state.user.id,
+        timestamp: Date.now()
+    };
+
+    const commentsRef = db.ref('news/' + currentNewsId + '/commentsData');
+    commentsRef.push(comment).then(() => {
+        input.value = '';
+        showToast('Комментарий добавлен');
+    }).catch(err => {
+        showToast('Ошибка: ' + err.message);
+    });
 }
 
 function escapeHtml(text) {
