@@ -106,6 +106,19 @@
         <!-- Home View -->
         <div id="homeView" class="view active">
             <div class="home-content">
+                <!-- News Banner -->
+                <div class="news-banner" id="newsBanner" onclick="openNewsModal()">
+                    <div class="news-banner-shimmer"></div>
+                    <div class="news-banner-content">
+                        <span class="news-banner-icon">📢</span>
+                        <div class="news-banner-text">
+                            <span class="news-banner-title" id="bannerNewsTitle">Новости платформы</span>
+                            <span class="news-banner-count" id="bannerNewsCount">0 новых</span>
+                        </div>
+                        <span class="news-banner-arrow">›</span>
+                    </div>
+                </div>
+
                 <div class="action-cards">
                     <button class="action-card action-card-create" onclick="showCreateOffer()">
                         <div class="action-icon">
@@ -211,28 +224,42 @@
                 </div>
 
                 <!-- Subscription Card -->
-                <div class="subscription-card" id="subscriptionCard" onclick="showSubscription()">
-                    <div class="subscription-info">
-                        <span class="subscription-badge free" id="subscriptionBadge">FREE</span>
-                        <div class="subscription-text">
-                            <span class="subscription-title">Бесплатный тариф</span>
-                            <span class="subscription-subtitle">3 сделки в день</span>
-                        </div>
+                <div class="subscription-card-new" id="subscriptionCard" onclick="showSubscription()">
+                    <div class="sub-icon" id="subIcon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                        </svg>
                     </div>
-                    <span class="subscription-upgrade">Улучшить ›</span>
+                    <div class="sub-content">
+                        <span class="sub-title" id="subTitle">Бесплатный тариф</span>
+                        <span class="sub-desc" id="subDesc">3 сделки в день • Улучшить</span>
+                    </div>
+                    <span class="sub-arrow">›</span>
                 </div>
 
                 <div class="menu-list">
                     <button class="menu-item" onclick="showMyOffers()">
-                        <span>📋 Мои заявки</span>
+                        <div class="menu-icon">📋</div>
+                        <span>Мои заявки</span>
                         <span class="chevron">›</span>
                     </button>
                     <button class="menu-item" onclick="showPromotionOptions()">
-                        <span>🚀 Продвижение заявок</span>
+                        <div class="menu-icon">🚀</div>
+                        <span>Продвижение</span>
                         <span class="chevron">›</span>
                     </button>
                     <button class="menu-item" onclick="showDonate()">
-                        <span>☕ Поддержать проект</span>
+                        <div class="menu-icon">💝</div>
+                        <span>Поддержать проект</span>
+                        <span class="chevron">›</span>
+                    </button>
+                </div>
+
+                <!-- Admin Button (hidden by default) -->
+                <div class="menu-list admin-menu" id="adminMenu" style="display: none;">
+                    <button class="menu-item menu-item-admin" onclick="showAdminPanel()">
+                        <div class="menu-icon">👑</div>
+                        <span>Админ-панель</span>
                         <span class="chevron">›</span>
                     </button>
                 </div>
@@ -654,6 +681,126 @@
 
                 <button class="btn-primary" onclick="payServiceFee()">Оплатить</button>
                 <button class="btn-text" onclick="closeModal('serviceFeeModal')">Отменить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Channel Modal -->
+    <div id="newsModal" class="modal">
+        <div class="modal-content modal-fullscreen">
+            <div class="modal-header news-modal-header">
+                <button class="back-btn news-back" onclick="closeModal('newsModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="news-channel-info">
+                    <span class="news-channel-name">📢 Новости</span>
+                    <span class="news-channel-subs" id="newsSubsCount">P2P Platform</span>
+                </div>
+            </div>
+            <div class="modal-body news-modal-body" id="newsModalList">
+                <!-- News items will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content modal-fullscreen">
+            <div class="modal-header">
+                <button class="back-btn" onclick="closeModal('adminModal')">‹</button>
+                <h2>👑 Админ-панель</h2>
+            </div>
+            <div class="modal-body admin-body">
+                <!-- Stats Cards -->
+                <div class="admin-stats">
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-value" id="adminTotalUsers">0</span>
+                        <span class="admin-stat-label">Пользователей</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-value" id="adminTotalDeals">0</span>
+                        <span class="admin-stat-label">Сделок</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-value" id="adminTotalOffers">0</span>
+                        <span class="admin-stat-label">Заявок</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-value" id="adminRevenue">0 ₸</span>
+                        <span class="admin-stat-label">Доход</span>
+                    </div>
+                </div>
+
+                <!-- Period Tabs -->
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="setAdminPeriod('day')">День</button>
+                    <button class="admin-tab" onclick="setAdminPeriod('week')">Неделя</button>
+                    <button class="admin-tab" onclick="setAdminPeriod('month')">Месяц</button>
+                </div>
+
+                <!-- Chart -->
+                <div class="admin-chart-section">
+                    <h3>📊 Активность</h3>
+                    <div class="admin-chart" id="adminChart"></div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="admin-section">
+                    <h3>👥 Пользователи онлайн</h3>
+                    <div class="admin-users-list" id="adminUsersList"></div>
+                </div>
+
+                <!-- Recent Deals -->
+                <div class="admin-section">
+                    <h3>📋 Последние сделки</h3>
+                    <div class="admin-deals-list" id="adminDealsList"></div>
+                </div>
+
+                <!-- News Management -->
+                <div class="admin-section">
+                    <h3>📢 Управление новостями</h3>
+                    <button class="btn-primary" onclick="showAddNewsForm()">+ Добавить новость</button>
+                    <div id="adminNewsList" class="admin-news-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add News Modal -->
+    <div id="addNewsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="back-btn" onclick="closeModal('addNewsModal')">‹</button>
+                <h2>Новая новость</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Тип</label>
+                    <select id="newsType" class="form-select">
+                        <option value="update">🚀 Обновление</option>
+                        <option value="info">ℹ️ Информация</option>
+                        <option value="promo">🎁 Акция</option>
+                        <option value="warning">⚠️ Важно</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Заголовок</label>
+                    <input type="text" id="newsTitle" class="form-input" placeholder="Заголовок новости">
+                </div>
+                <div class="form-group">
+                    <label>Текст</label>
+                    <textarea id="newsText" class="form-textarea" rows="4" placeholder="Текст новости"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="newsPinned">
+                        <span class="checkmark"></span>
+                        <span>Закрепить новость</span>
+                    </label>
+                </div>
+                <button class="btn-primary" onclick="publishNews()">Опубликовать</button>
             </div>
         </div>
     </div>

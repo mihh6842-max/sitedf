@@ -1,4 +1,4 @@
-console.log('App.js loaded - v8');
+console.log('App.js loaded - v13');
 
 // ========== CONFIGURATION ==========
 const CONFIG = {
@@ -225,6 +225,7 @@ function switchView(view) {
         document.getElementById('headerTitle').textContent = 'P2P Platform';
         loadRatesFromStorage();
         renderExchangeRates();
+        loadNews();
     } else if (view === 'offers') {
         document.getElementById('offersView').classList.add('active');
         document.getElementById('headerTitle').textContent = 'Заявки';
@@ -249,6 +250,7 @@ function updateProfile() {
     document.getElementById('profileDeals').textContent = state.user.deals || 0;
     document.getElementById('profileRating').textContent = state.user.rating?.toFixed(1) || '5.0';
     updateSubscriptionUI();
+    checkAdmin();
 }
 
 // ========== EXCHANGE RATES ==========
@@ -353,6 +355,140 @@ function renderExchangeRates() {
 }
 
 setInterval(fetchExchangeRates, 60 * 60 * 1000);
+
+// ========== NEWS ==========
+let newsData = [];
+
+function loadNews() {
+    if (db) {
+        db.ref('news').orderByChild('created_at').limitToLast(20).on('value', snapshot => {
+            newsData = [];
+            snapshot.forEach(child => {
+                newsData.unshift({ id: child.key, ...child.val() });
+            });
+            newsData.sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return b.created_at - a.created_at;
+            });
+            updateNewsBanner();
+        });
+    } else {
+        newsData = [
+            {
+                id: '1',
+                type: 'update',
+                title: '🚀 Обновление платформы v2.0',
+                text: 'Добавлены PRO-тарифы и продвижение заявок!\n\n✅ Поднять в топ\n✅ Выделить цветом\n✅ Закрепить на 24 часа\n\nТеперь ваши заявки будут заметнее!',
+                created_at: Date.now() / 1000,
+                pinned: true,
+                views: 1247
+            },
+            {
+                id: '2',
+                type: 'info',
+                title: '🔒 Правила безопасности',
+                text: 'Напоминаем важные правила:\n\n• Всегда проверяйте рейтинг контрагента\n• Не переводите деньги до подтверждения\n• Используйте встроенный чат\n• При проблемах обращайтесь в арбитраж',
+                created_at: (Date.now() - 86400000) / 1000,
+                views: 892
+            },
+            {
+                id: '3',
+                type: 'promo',
+                title: '🎁 Приглашай друзей',
+                text: 'Расскажите о платформе друзьям и получайте бонусы!\n\nКаждый приглашённый пользователь = +1 бесплатная сделка',
+                created_at: (Date.now() - 172800000) / 1000,
+                views: 654
+            }
+        ];
+        updateNewsBanner();
+    }
+}
+
+function updateNewsBanner() {
+    const lastSeen = parseInt(localStorage.getItem('lastNewsSeenAt') || '0');
+    const newCount = newsData.filter(n => n.created_at * 1000 > lastSeen).length;
+
+    const titleEl = document.getElementById('bannerNewsTitle');
+    const countEl = document.getElementById('bannerNewsCount');
+
+    if (newsData.length > 0 && titleEl) {
+        const latest = newsData[0];
+        titleEl.textContent = latest.title.substring(0, 30) + (latest.title.length > 30 ? '...' : '');
+    }
+
+    if (countEl) {
+        countEl.textContent = newCount > 0 ? `${newCount} новых` : `${newsData.length} записей`;
+    }
+}
+
+function openNewsModal() {
+    openModal('newsModal');
+    renderNewsModal();
+    localStorage.setItem('lastNewsSeenAt', Date.now().toString());
+    updateNewsBanner();
+}
+
+function renderNewsModal() {
+    const container = document.getElementById('newsModalList');
+    if (!container) return;
+
+    if (newsData.length === 0) {
+        container.innerHTML = `
+            <div class="news-empty">
+                <div class="news-empty-icon">📭</div>
+                <div>Новостей пока нет</div>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = newsData.map(news => {
+        const date = new Date(news.created_at * 1000);
+        const timeStr = formatNewsTime(date);
+        const views = news.views || Math.floor(Math.random() * 500 + 100);
+
+        return `
+            <div class="news-post">
+                <div class="news-post-header">
+                    <div class="news-post-avatar">📢</div>
+                    <div class="news-post-meta">
+                        <div class="news-post-channel">P2P Platform</div>
+                        <div class="news-post-time">${timeStr}</div>
+                    </div>
+                    ${news.pinned ? '<span class="news-post-pin">📌</span>' : ''}
+                </div>
+                <div class="news-post-content">
+                    <div class="news-post-title">${escapeHtml(news.title)}</div>
+                    <div class="news-post-text">${escapeHtml(news.text)}</div>
+                    ${news.image ? `<img src="${news.image}" class="news-post-image" alt="">` : ''}
+                </div>
+                <div class="news-post-footer">
+                    <span class="news-post-views">👁 ${views}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function formatNewsTime(date) {
+    const now = new Date();
+    const diff = now - date;
+    const days = Math.floor(diff / 86400000);
+
+    if (days === 0) {
+        return 'сегодня в ' + date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    }
+    if (days === 1) return 'вчера';
+    if (days < 7) return `${days} дн. назад`;
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
 // ========== CREATE OFFER ==========
 function showCreateOffer() {
@@ -1339,13 +1475,14 @@ function showSubscription() {
 
 function updateSubscriptionUI() {
     const isPro = state.user?.isPro;
-    const badge = document.getElementById('subscriptionBadge');
-    if (isPro && badge) {
-        badge.textContent = '⭐ PRO';
-        badge.className = 'subscription-badge pro';
-        document.querySelector('.subscription-title').textContent = 'PRO-аккаунт';
-        document.querySelector('.subscription-subtitle').textContent = 'Безлимитные сделки';
-        document.querySelector('.subscription-upgrade').textContent = 'Активен ›';
+    const card = document.getElementById('subscriptionCard');
+    const title = document.getElementById('subTitle');
+    const desc = document.getElementById('subDesc');
+
+    if (isPro && card) {
+        card.classList.add('pro');
+        if (title) title.textContent = 'PRO-аккаунт';
+        if (desc) desc.textContent = 'Безлимитные сделки • Активен';
     }
 }
 
@@ -1464,4 +1601,280 @@ function checkDealLimit() {
         return false;
     }
     return true;
+}
+
+// ========== ADMIN PANEL ==========
+const ADMIN_ID = '7338817463';
+let adminPeriod = 'day';
+let adminData = { users: [], deals: [], offers: [] };
+
+function checkAdmin() {
+    const userId = String(state.user?.id || '');
+    const adminMenu = document.getElementById('adminMenu');
+    if (adminMenu) {
+        adminMenu.style.display = userId === ADMIN_ID ? 'block' : 'none';
+    }
+}
+
+function showAdminPanel() {
+    if (String(state.user?.id) !== ADMIN_ID) {
+        showToast('Доступ запрещён', 'error');
+        return;
+    }
+    openModal('adminModal');
+    loadAdminData();
+}
+
+function loadAdminData() {
+    if (!db) {
+        // Демо данные
+        adminData = {
+            users: [
+                { id: '1', name: 'Александр', username: 'alex', last_active: Date.now(), deals: 5 },
+                { id: '2', name: 'Мария', username: 'maria', last_active: Date.now() - 300000, deals: 3 },
+                { id: '3', name: 'Иван', username: 'ivan', last_active: Date.now() - 3600000, deals: 8 }
+            ],
+            deals: [
+                { id: '1', from: 'USD', to: 'KZT', amount: 1000, status: 'active', created_at: Date.now() / 1000 },
+                { id: '2', from: 'EUR', to: 'KZT', amount: 500, status: 'completed', created_at: (Date.now() - 86400000) / 1000 }
+            ],
+            offers: state.allOffers || []
+        };
+        renderAdminPanel();
+        return;
+    }
+
+    // Загрузка из Firebase
+    Promise.all([
+        db.ref('users').once('value'),
+        db.ref('deals').once('value'),
+        db.ref('offers').once('value')
+    ]).then(([usersSnap, dealsSnap, offersSnap]) => {
+        adminData.users = [];
+        usersSnap.forEach(child => adminData.users.push({ id: child.key, ...child.val() }));
+
+        adminData.deals = [];
+        dealsSnap.forEach(child => adminData.deals.push({ id: child.key, ...child.val() }));
+
+        adminData.offers = [];
+        offersSnap.forEach(child => adminData.offers.push({ id: child.key, ...child.val() }));
+
+        renderAdminPanel();
+    });
+}
+
+function renderAdminPanel() {
+    updateAdminStats();
+    renderAdminChart();
+    renderAdminUsers();
+    renderAdminDeals();
+    renderAdminNews();
+}
+
+function updateAdminStats() {
+    const now = Date.now();
+    const periodMs = adminPeriod === 'day' ? 86400000 : adminPeriod === 'week' ? 604800000 : 2592000000;
+    const periodStart = now - periodMs;
+
+    const periodDeals = adminData.deals.filter(d => d.created_at * 1000 > periodStart);
+    const periodUsers = adminData.users.filter(u => u.last_active > periodStart);
+
+    document.getElementById('adminTotalUsers').textContent = adminData.users.length;
+    document.getElementById('adminTotalDeals').textContent = periodDeals.length;
+    document.getElementById('adminTotalOffers').textContent = adminData.offers.length;
+
+    const revenue = periodDeals.filter(d => d.status === 'completed').length * PRICES.serviceFee;
+    document.getElementById('adminRevenue').textContent = revenue.toLocaleString() + ' ₸';
+}
+
+function setAdminPeriod(period) {
+    adminPeriod = period;
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    renderAdminPanel();
+}
+
+function renderAdminChart() {
+    const chart = document.getElementById('adminChart');
+    if (!chart) return;
+
+    const now = Date.now();
+    let labels = [];
+    let data = [];
+
+    if (adminPeriod === 'day') {
+        // 24 часа
+        for (let i = 23; i >= 0; i--) {
+            const hour = new Date(now - i * 3600000).getHours();
+            labels.push(hour + ':00');
+            const hourStart = now - (i + 1) * 3600000;
+            const hourEnd = now - i * 3600000;
+            data.push(adminData.deals.filter(d => d.created_at * 1000 > hourStart && d.created_at * 1000 <= hourEnd).length);
+        }
+        // Показываем только каждые 4 часа
+        labels = labels.map((l, i) => i % 4 === 0 ? l : '');
+    } else if (adminPeriod === 'week') {
+        // 7 дней
+        const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(now - i * 86400000);
+            labels.push(days[date.getDay()]);
+            const dayStart = now - (i + 1) * 86400000;
+            const dayEnd = now - i * 86400000;
+            data.push(adminData.deals.filter(d => d.created_at * 1000 > dayStart && d.created_at * 1000 <= dayEnd).length);
+        }
+    } else {
+        // 30 дней (по 5 дней)
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date(now - i * 5 * 86400000);
+            labels.push(date.getDate() + '.' + (date.getMonth() + 1));
+            const start = now - (i + 1) * 5 * 86400000;
+            const end = now - i * 5 * 86400000;
+            data.push(adminData.deals.filter(d => d.created_at * 1000 > start && d.created_at * 1000 <= end).length);
+        }
+    }
+
+    const maxVal = Math.max(...data, 1);
+    chart.innerHTML = data.map((val, i) => {
+        const height = (val / maxVal) * 160 + 10;
+        return `<div class="chart-bar" style="height: ${height}px" data-value="${val}" data-label="${labels[i]}"></div>`;
+    }).join('');
+}
+
+function renderAdminUsers() {
+    const container = document.getElementById('adminUsersList');
+    if (!container) return;
+
+    const now = Date.now();
+    const sorted = [...adminData.users].sort((a, b) => (b.last_active || 0) - (a.last_active || 0)).slice(0, 10);
+
+    if (sorted.length === 0) {
+        container.innerHTML = '<div class="admin-empty">Нет пользователей</div>';
+        return;
+    }
+
+    container.innerHTML = sorted.map(user => {
+        const isOnline = (now - (user.last_active || 0)) < 300000; // 5 мин
+        const lastSeen = user.last_active ? formatTimeAgo(user.last_active) : 'неизвестно';
+
+        return `
+            <div class="admin-user-item">
+                <div class="admin-user-avatar">${(user.name || 'U')[0].toUpperCase()}</div>
+                <div class="admin-user-info">
+                    <div class="admin-user-name">${escapeHtml(user.name || 'Пользователь')}</div>
+                    <div class="admin-user-meta">@${user.username || 'unknown'} · ${user.deals || 0} сделок · ${lastSeen}</div>
+                </div>
+                <div class="admin-user-status ${isOnline ? '' : 'offline'}"></div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderAdminDeals() {
+    const container = document.getElementById('adminDealsList');
+    if (!container) return;
+
+    const sorted = [...adminData.deals].sort((a, b) => b.created_at - a.created_at).slice(0, 10);
+
+    if (sorted.length === 0) {
+        container.innerHTML = '<div class="admin-empty">Нет сделок</div>';
+        return;
+    }
+
+    const statusLabels = { active: 'Активна', completed: 'Завершена', cancelled: 'Отменена', pending: 'Ожидает' };
+
+    container.innerHTML = sorted.map(deal => {
+        const date = new Date(deal.created_at * 1000);
+        const status = deal.status || 'active';
+
+        return `
+            <div class="admin-deal-item">
+                <div class="admin-deal-info">
+                    <div class="admin-deal-pair">${deal.from_currency || deal.from || '?'} → ${deal.to_currency || deal.to || '?'}</div>
+                    <div class="admin-deal-meta">${deal.amount || 0} · ${date.toLocaleDateString('ru-RU')}</div>
+                </div>
+                <span class="admin-deal-status ${status}">${statusLabels[status] || status}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderAdminNews() {
+    const container = document.getElementById('adminNewsList');
+    if (!container) return;
+
+    if (newsData.length === 0) {
+        container.innerHTML = '<div class="admin-empty">Нет новостей</div>';
+        return;
+    }
+
+    container.innerHTML = newsData.map(news => `
+        <div class="admin-news-item">
+            <span class="admin-news-title">${news.pinned ? '📌 ' : ''}${escapeHtml(news.title)}</span>
+            <button class="admin-news-delete" onclick="deleteNews('${news.id}')">Удалить</button>
+        </div>
+    `).join('');
+}
+
+function formatTimeAgo(timestamp) {
+    const diff = Date.now() - timestamp;
+    if (diff < 60000) return 'только что';
+    if (diff < 3600000) return Math.floor(diff / 60000) + ' мин назад';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + ' ч назад';
+    return Math.floor(diff / 86400000) + ' дн назад';
+}
+
+function showAddNewsForm() {
+    openModal('addNewsModal');
+}
+
+function publishNews() {
+    const type = document.getElementById('newsType').value;
+    const title = document.getElementById('newsTitle').value.trim();
+    const text = document.getElementById('newsText').value.trim();
+    const pinned = document.getElementById('newsPinned').checked;
+
+    if (!title || !text) {
+        showToast('Заполните все поля', 'error');
+        return;
+    }
+
+    const news = {
+        type,
+        title,
+        text,
+        pinned,
+        created_at: Math.floor(Date.now() / 1000)
+    };
+
+    if (db) {
+        db.ref('news').push(news).then(() => {
+            showToast('Новость опубликована', 'success');
+            closeModal('addNewsModal');
+            document.getElementById('newsTitle').value = '';
+            document.getElementById('newsText').value = '';
+            document.getElementById('newsPinned').checked = false;
+        });
+    } else {
+        newsData.unshift({ id: 'local_' + Date.now(), ...news });
+        renderNews();
+        renderAdminNews();
+        showToast('Новость добавлена (локально)', 'success');
+        closeModal('addNewsModal');
+    }
+}
+
+function deleteNews(newsId) {
+    showConfirm('Удалить новость?', 'Это действие нельзя отменить', () => {
+        if (db) {
+            db.ref('news/' + newsId).remove().then(() => {
+                showToast('Новость удалена', 'success');
+            });
+        } else {
+            newsData = newsData.filter(n => n.id !== newsId);
+            renderNews();
+            renderAdminNews();
+            showToast('Новость удалена', 'success');
+        }
+    });
 }

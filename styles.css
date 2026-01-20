@@ -395,26 +395,35 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s;
+}
+
+.action-card:active .action-icon {
+    transform: scale(0.95);
 }
 
 .action-card-create .action-icon {
-    background: rgba(59, 130, 246, 0.12);
-    color: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .action-card-search .action-icon {
-    background: rgba(16, 185, 129, 0.12);
-    color: #10b981;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .action-card-deals .action-icon {
-    background: rgba(249, 115, 22, 0.12);
-    color: #f97316;
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    color: white;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }
 
 .action-card-profile .action-icon {
-    background: rgba(139, 92, 246, 0.12);
-    color: #8b5cf6;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .action-text {
@@ -493,6 +502,227 @@ body {
     font-size: 19px;
     font-weight: 700;
     color: var(--primary);
+}
+
+/* ===== News Banner ===== */
+.news-banner {
+    margin: 0 20px 16px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.news-banner:active {
+    transform: scale(0.98);
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.news-banner-shimmer {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    100% { left: 100%; }
+}
+
+.news-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.news-banner-icon {
+    font-size: 24px;
+}
+
+.news-banner-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.news-banner-title {
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.news-banner-count {
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+}
+
+.news-banner-arrow {
+    color: white;
+    font-size: 24px;
+    font-weight: 300;
+}
+
+/* ===== News Modal (TG Style) ===== */
+.news-modal-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.news-back {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.2s;
+}
+
+.news-back:active {
+    background: rgba(255,255,255,0.25);
+    transform: scale(0.95);
+}
+
+.news-channel-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.news-channel-name {
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.news-channel-subs {
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+}
+
+.news-modal-body {
+    padding: 0 !important;
+    background: var(--bg-main);
+}
+
+.news-post {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-light);
+    padding: 16px 20px;
+}
+
+.news-post:last-child {
+    border-bottom: none;
+}
+
+.news-post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.news-post-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.news-post-meta {
+    flex: 1;
+}
+
+.news-post-channel {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.news-post-time {
+    font-size: 13px;
+    color: var(--text-tertiary);
+}
+
+.news-post-pin {
+    color: var(--primary);
+    font-size: 16px;
+}
+
+.news-post-content {
+    padding-left: 54px;
+}
+
+.news-post-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.news-post-text {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.news-post-image {
+    width: calc(100% + 40px);
+    margin: 12px -20px 0;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+.news-post-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    padding-left: 54px;
+}
+
+.news-post-views {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-tertiary);
+}
+
+.news-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-tertiary);
+    font-size: 15px;
+}
+
+.news-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
 }
 
 /* ===== Offers List ===== */
@@ -2134,66 +2364,131 @@ body {
     background: rgba(239, 68, 68, 0.1);
 }
 
-/* ========== SUBSCRIPTION ========== */
-.subscription-card {
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    border-radius: 16px;
-    padding: 18px;
+/* ========== SUBSCRIPTION NEW ========== */
+.subscription-card-new {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
     margin: 0 20px 16px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 12px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.2s;
 }
 
-.subscription-card:active {
+.subscription-card-new:active {
     transform: scale(0.98);
+    background: var(--bg-tertiary);
 }
 
-.subscription-info {
+.subscription-card-new.pro {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1));
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.sub-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--bg-tertiary);
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    color: var(--text-secondary);
 }
 
-.subscription-badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.subscription-badge.free {
-    background: rgba(255,255,255,0.2);
-    color: white;
-}
-
-.subscription-badge.pro {
+.subscription-card-new.pro .sub-icon {
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
     color: #1e293b;
 }
 
-.subscription-text {
+.sub-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
-.subscription-title {
-    color: white;
-    font-weight: 600;
+.sub-title {
     font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-.subscription-subtitle {
-    color: rgba(255,255,255,0.7);
+.sub-desc {
     font-size: 13px;
+    color: var(--text-secondary);
 }
 
-.subscription-upgrade {
+.sub-arrow {
+    font-size: 20px;
+    color: var(--text-tertiary);
+    font-weight: 300;
+}
+
+/* ========== CHANNEL CARD ========== */
+.channel-card {
+    background: linear-gradient(135deg, #0088cc, #00a8e8);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin: 0 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.channel-card:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+.channel-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: white;
-    font-weight: 500;
-    font-size: 14px;
+}
+
+.channel-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.channel-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+}
+
+.channel-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+}
+
+.channel-badge {
+    background: white;
+    color: #0088cc;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+/* ========== MENU ICON ========== */
+.menu-icon {
+    width: 32px;
+    font-size: 18px;
+    text-align: center;
 }
 
 /* ========== PLAN CARDS ========== */
@@ -2455,4 +2750,282 @@ body {
     top: 10px;
     right: 10px;
     font-size: 16px;
+}
+
+/* ========== ADMIN PANEL ========== */
+.menu-item-admin {
+    color: #f59e0b;
+}
+
+.modal-fullscreen .modal-body {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+.admin-body {
+    padding: 16px;
+}
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.admin-stat-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+}
+
+.admin-stat-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
+
+.admin-stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.admin-tabs {
+    display: flex;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.admin-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-tab.active {
+    background: var(--primary);
+    color: white;
+}
+
+.admin-chart-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-chart-section h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.admin-chart {
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.chart-bar {
+    flex: 1;
+    background: linear-gradient(180deg, var(--primary), rgba(59, 130, 246, 0.3));
+    border-radius: 6px 6px 0 0;
+    min-height: 10px;
+    position: relative;
+    transition: height 0.3s ease;
+}
+
+.chart-bar:hover {
+    opacity: 0.8;
+}
+
+.chart-bar::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.chart-bar::before {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+}
+
+.admin-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-section h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.admin-users-list,
+.admin-deals-list,
+.admin-news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.admin-user-item,
+.admin-deal-item,
+.admin-news-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+}
+
+.admin-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.admin-user-info {
+    flex: 1;
+}
+
+.admin-user-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.admin-user-meta {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.admin-user-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.admin-user-status.offline {
+    background: var(--text-tertiary);
+}
+
+.admin-deal-info {
+    flex: 1;
+}
+
+.admin-deal-pair {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.admin-deal-meta {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+.admin-deal-status {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.admin-deal-status.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.admin-deal-status.completed {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.admin-deal-status.cancelled {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.admin-news-item {
+    justify-content: space-between;
+}
+
+.admin-news-title {
+    font-weight: 600;
+    font-size: 14px;
+    flex: 1;
+}
+
+.admin-news-delete {
+    padding: 6px 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.admin-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-tertiary);
+    font-size: 14px;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--bg-secondary);
+    font-size: 15px;
+    color: var(--text-primary);
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
 }
