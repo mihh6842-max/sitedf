@@ -447,25 +447,31 @@ function renderNewsModal() {
         const date = new Date(news.created_at * 1000);
         const timeStr = formatNewsTime(date);
         const views = news.views || Math.floor(Math.random() * 500 + 100);
+        const comments = news.comments || 0;
 
         return `
-            <div class="news-post" oncontextmenu="showNewsMenu(event, '${news.id}')" ontouchstart="startNewsHold('${news.id}')" ontouchend="endNewsHold()">
-                <div class="news-post-header">
-                    <div class="news-post-avatar">📢</div>
-                    <div class="news-post-meta">
-                        <div class="news-post-channel">P2P Platform</div>
-                        <div class="news-post-time">${timeStr}</div>
+            <div class="news-item">
+                <div class="news-item-avatar">📢</div>
+                <div class="news-item-content">
+                    <div class="news-item-header">
+                        <span class="news-item-name">P2P Platform</span>
+                        ${news.pinned ? '<span class="news-item-pin">📌</span>' : ''}
                     </div>
-                    ${news.pinned ? '<span class="news-post-pin">📌</span>' : ''}
-                    ${isAdminUnlocked ? `<button class="news-delete-btn" onclick="deleteNews('${news.id}')">🗑</button>` : ''}
-                </div>
-                <div class="news-post-content">
-                    <div class="news-post-title">${escapeHtml(news.title)}</div>
-                    <div class="news-post-text">${escapeHtml(news.text)}</div>
-                    ${news.image ? `<img src="${news.image}" class="news-post-image" alt="">` : ''}
-                </div>
-                <div class="news-post-footer">
-                    <span class="news-post-views">👁 ${views}</span>
+                    <div class="news-bubble">
+                        <div class="news-bubble-title">${escapeHtml(news.title)}</div>
+                        <div class="news-bubble-text">${escapeHtml(news.text)}</div>
+                        ${news.image ? `<img src="${news.image}" class="news-bubble-image" alt="">` : ''}
+                    </div>
+                    <div class="news-item-meta">
+                        <span class="news-meta-time">${timeStr}</span>
+                        <span class="news-meta-views">👁 ${views}</span>
+                    </div>
+                    <button class="news-comment-btn" onclick="openComments('${news.id}')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>${comments} комментариев</span>
+                    </button>
                 </div>
             </div>
         `;
@@ -483,6 +489,10 @@ function formatNewsTime(date) {
     if (days === 1) return 'вчера';
     if (days < 7) return `${days} дн. назад`;
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+}
+
+function openComments(newsId) {
+    showToast('Комментарии скоро будут доступны');
 }
 
 function escapeHtml(text) {
