@@ -210,6 +210,7 @@ function updateUI() {
     loadRatesFromStorage();
     renderExchangeRates();
     renderOffers();
+    loadNews();
 }
 
 // ========== NAVIGATION ==========
