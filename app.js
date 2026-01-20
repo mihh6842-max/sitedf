@@ -1,4 +1,4 @@
-console.log('App.js loaded - v14');
+console.log('App.js loaded - v15');
 
 // ========== CONFIGURATION ==========
 const CONFIG = {
@@ -1604,20 +1604,29 @@ function checkDealLimit() {
 }
 
 // ========== ADMIN PANEL ==========
-const ADMIN_USERNAME = 'stray_light_sno';
+const ADMIN_PASSWORD = '2323';
 let adminPeriod = 'day';
 let adminData = { users: [], deals: [], offers: [] };
+let isAdminUnlocked = false;
+
+function secretAdmin() {
+    const pass = prompt('🔐');
+    if (pass === ADMIN_PASSWORD) {
+        isAdminUnlocked = true;
+        document.getElementById('adminMenu').style.display = 'block';
+        showToast('Админка активирована 👑', 'success');
+    }
+}
 
 function checkAdmin() {
-    const username = state.user?.username || '';
     const adminMenu = document.getElementById('adminMenu');
     if (adminMenu) {
-        adminMenu.style.display = username === ADMIN_USERNAME ? 'block' : 'none';
+        adminMenu.style.display = isAdminUnlocked ? 'block' : 'none';
     }
 }
 
 function showAdminPanel() {
-    if (state.user?.username !== ADMIN_USERNAME) {
+    if (!isAdminUnlocked) {
         showToast('Доступ запрещён', 'error');
         return;
     }

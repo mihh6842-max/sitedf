@@ -2757,6 +2757,14 @@ body {
     color: #f59e0b;
 }
 
+.version-tag {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+    user-select: none;
+}
+
 .modal-fullscreen .modal-body {
     max-height: calc(100vh - 120px);
     overflow-y: auto;
