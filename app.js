@@ -196,6 +196,26 @@ function initEventListeners() {
             createOffer();
         });
     }
+
+    // Voice recording buttons
+    const recordingSendBtn = document.getElementById('recordingSendBtn');
+    const recordingCancelBtn = document.getElementById('recordingCancelBtn');
+
+    if (recordingSendBtn) {
+        recordingSendBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            sendVoiceMessage();
+        });
+        recordingSendBtn.addEventListener('click', sendVoiceMessage);
+    }
+
+    if (recordingCancelBtn) {
+        recordingCancelBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            cancelRecording();
+        });
+        recordingCancelBtn.addEventListener('click', cancelRecording);
+    }
 }
 
 // ========== MAIN APP ==========
@@ -890,10 +910,44 @@ function openDeal(dealId) {
     document.querySelectorAll('#mainApp > .view').forEach(v => v.classList.remove('active'));
     document.getElementById('dealView').classList.add('active');
 
-    // Header
     document.getElementById('dealHeaderName').textContent = deal.offer_user_name;
     updateDealStatus();
+    updateDealInfoCard(deal);
     loadChat();
+}
+
+function updateDealInfoCard(deal) {
+    const card = document.getElementById('dealInfoCard');
+    const isSeller = deal.offer_user_id === state.user.id;
+
+    const fromAmount = deal.amount;
+    const toAmount = deal.amount * deal.rate;
+
+    if (isSeller) {
+        document.getElementById('dealCardFrom').textContent = `${toAmount.toLocaleString()} ${deal.to_currency}`;
+        document.getElementById('dealCardTo').textContent = `${fromAmount} ${deal.from_currency}`;
+    } else {
+        document.getElementById('dealCardFrom').textContent = `${fromAmount} ${deal.from_currency}`;
+        document.getElementById('dealCardTo').textContent = `${toAmount.toLocaleString()} ${deal.to_currency}`;
+    }
+
+    document.getElementById('dealCardRate').textContent = `${deal.rate} ${deal.to_currency}`;
+
+    const btn = document.getElementById('dealStartPaymentBtn');
+
+    if (deal.status === 'completed' || deal.payment_id) {
+        card.style.display = 'none';
+        return;
+    }
+
+    if (isSeller) {
+        card.style.display = 'block';
+        btn.style.display = 'block';
+        btn.disabled = false;
+    } else {
+        card.style.display = 'block';
+        btn.style.display = 'none';
+    }
 }
 
 function updateDealStatus() {
@@ -1156,27 +1210,41 @@ function closeImagePreview() {
 async function startRecording() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder = new MediaRecorder(stream, {
+            mimeType: 'audio/webm;codecs=opus'
+        });
         audioChunks = [];
 
         mediaRecorder.ondataavailable = (e) => {
-            audioChunks.push(e.data);
+            if (e.data.size > 0) {
+                audioChunks.push(e.data);
+            }
         };
 
-        mediaRecorder.start();
+        mediaRecorder.onstop = () => {
+            stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorder.start(100);
         recordingStartTime = Date.now();
 
         document.getElementById('voiceBtn').classList.add('recording');
         document.getElementById('recordingOverlay').style.display = 'flex';
 
-        // Generate waveform bars
         const waveform = document.getElementById('recordingWaveform');
-        waveform.innerHTML = Array(30).fill(0).map(() =>
-            `<div class="bar" style="height:${Math.random() * 20 + 10}px; animation-delay:${Math.random() * 0.5}s"></div>`
+        waveform.innerHTML = Array(25).fill(0).map((_, i) =>
+            `<div class="bar" style="height:${Math.random() * 20 + 8}px; animation-delay:${i * 0.1}s"></div>`
         ).join('');
 
         recordingInterval = setInterval(updateRecordingTime, 100);
+
+        setTimeout(() => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                sendVoiceMessage();
+            }
+        }, 60000);
     } catch (err) {
+        console.error('Microphone error:', err);
         showToast('Нет доступа к микрофону', 'error');
     }
 }
@@ -1185,17 +1253,26 @@ function updateRecordingTime() {
     const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
     const mins = Math.floor(elapsed / 60);
     const secs = elapsed % 60;
-    document.getElementById('recordingTime').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    const timeEl = document.getElementById('recordingTime');
+    timeEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+    if (elapsed > 50) {
+        timeEl.style.color = '#ff3b30';
+    } else if (elapsed > 30) {
+        timeEl.style.color = '#ff9500';
+    }
 }
 
 function stopRecording() {
-    if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+    if (!mediaRecorder) return;
 
-    mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach(t => t.stop());
+    if (mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+    }
 
     clearInterval(recordingInterval);
     document.getElementById('voiceBtn').classList.remove('recording');
+    document.getElementById('recordingTime').style.color = '';
 }
 
 function cancelRecording() {
@@ -1205,38 +1282,46 @@ function cancelRecording() {
 }
 
 function sendVoiceMessage() {
-    if (audioChunks.length === 0 || !state.currentDeal || !db) {
-        cancelRecording();
-        return;
-    }
+    stopRecording();
 
-    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-    const reader = new FileReader();
+    setTimeout(() => {
+        if (audioChunks.length === 0 || !state.currentDeal || !db) {
+            audioChunks = [];
+            document.getElementById('recordingOverlay').style.display = 'none';
+            showToast('Нет данных для отправки', 'error');
+            return;
+        }
 
-    reader.onload = () => {
-        const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
-        const mins = Math.floor(duration / 60);
-        const secs = duration % 60;
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
 
-        const message = {
-            id: 'msg_' + Date.now(),
-            type: 'voice',
-            deal_id: state.currentDeal.id,
-            user_id: state.user.id,
-            user_name: state.user.name,
-            audioUrl: reader.result,
-            duration: `${mins}:${secs.toString().padStart(2, '0')}`,
-            waveform: Array(20).fill(0).map(() => Math.random() * 20 + 8),
-            timestamp: Date.now()
+        reader.onload = () => {
+            const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const mins = Math.floor(duration / 60);
+            const secs = duration % 60;
+
+            const message = {
+                id: 'msg_' + Date.now(),
+                type: 'voice',
+                deal_id: state.currentDeal.id,
+                user_id: state.user.id,
+                user_name: state.user.name,
+                audioUrl: reader.result,
+                duration: `${mins}:${secs.toString().padStart(2, '0')}`,
+                waveform: Array(20).fill(0).map(() => Math.random() * 20 + 8),
+                timestamp: Date.now()
+            };
+
+            db.ref('chats/' + state.currentDeal.id + '/' + message.id).set(message)
+                .catch(() => showToast('Ошибка отправки', 'error'));
+
+            showToast('Голосовое отправлено', 'success');
         };
 
-        db.ref('chats/' + state.currentDeal.id + '/' + message.id).set(message)
-            .catch(() => showToast('Ошибка отправки', 'error'));
-    };
-
-    reader.readAsDataURL(blob);
-    audioChunks = [];
-    document.getElementById('recordingOverlay').style.display = 'none';
+        reader.readAsDataURL(blob);
+        audioChunks = [];
+        document.getElementById('recordingOverlay').style.display = 'none';
+    }, 100);
 }
 
 // Voice playback
@@ -1754,6 +1839,7 @@ function showAdminPanel() {
     }
     openModal('adminModal');
     loadAdminData();
+    loadAdminComplaints();
 }
 
 function loadAdminData() {

@@ -286,6 +286,27 @@
                 <div class="deal-header-chevron">›</div>
             </div>
 
+            <div class="deal-info-card" id="dealInfoCard" style="display: none;">
+                <div class="deal-info-row">
+                    <div class="deal-info-item">
+                        <span class="deal-info-label">Отдаёте</span>
+                        <span class="deal-info-value" id="dealCardFrom">1000 USD</span>
+                    </div>
+                    <div class="deal-info-arrow">→</div>
+                    <div class="deal-info-item">
+                        <span class="deal-info-label">Получаете</span>
+                        <span class="deal-info-value" id="dealCardTo">460,000 ₸</span>
+                    </div>
+                </div>
+                <div class="deal-info-rate">
+                    <span class="deal-info-rate-label">Курс:</span>
+                    <span class="deal-info-rate-value" id="dealCardRate">460 ₸</span>
+                </div>
+                <button class="deal-start-payment-btn" id="dealStartPaymentBtn" onclick="showPaymentModal()">
+                    💳 Создать оплату
+                </button>
+            </div>
+
             <div class="deal-view-content">
                 <div class="deal-chat">
                     <div class="chat-messages" id="chatMessages"></div>
@@ -328,12 +349,12 @@
                     </div>
                     <div class="recording-waveform" id="recordingWaveform"></div>
                     <div class="recording-actions">
-                        <button class="recording-cancel" onclick="cancelRecording()">
+                        <button class="recording-cancel" id="recordingCancelBtn">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </button>
-                        <button class="recording-send" onclick="sendVoiceMessage()">
+                        <button class="recording-send" id="recordingSendBtn">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -758,6 +779,16 @@
                 <div class="admin-section">
                     <h3>📋 Последние сделки</h3>
                     <div class="admin-deals-list" id="adminDealsList"></div>
+                </div>
+
+                <!-- Complaints -->
+                <div class="admin-section">
+                    <h3>⚠️ Жалобы</h3>
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" onclick="filterComplaints('pending')">Активные</button>
+                        <button class="admin-tab" onclick="filterComplaints('resolved')">Решённые</button>
+                    </div>
+                    <div class="admin-complaints-list" id="adminComplaintsList"></div>
                 </div>
 
                 <!-- News Management -->

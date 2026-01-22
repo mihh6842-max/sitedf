@@ -2274,8 +2274,8 @@ body {
 
 .recording-cancel,
 .recording-send {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
@@ -2283,6 +2283,16 @@ body {
     align-items: center;
     justify-content: center;
     transition: transform 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+}
+
+.recording-cancel::before,
+.recording-send::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
 }
 
 .recording-cancel {
